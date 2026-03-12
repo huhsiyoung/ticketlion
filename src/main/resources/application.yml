@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: ticketlion
+
+  profiles:
+    active: dev
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+
+server:
+  port: 8080

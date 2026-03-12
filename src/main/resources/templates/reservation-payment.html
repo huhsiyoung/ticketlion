@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>티켓사자 - 결제하기</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    .payment-container {
+      position: relative;
+      z-index: 1;
+      max-width: 1000px;
+      margin: 20px auto;
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .payment-header {
+      background: white;
+      border-radius: 20px;
+      padding: 20px 30px;
+      margin-bottom: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 4px;
+    }
+
+    .header-subtitle {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .payment-main {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 20px;
+    }
+
+    .payment-left {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .section-card {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .booking-info {
+      display: flex;
+      gap: 14px;
+      padding: 14px;
+      background: #f8f9fa;
+      border-radius: 12px;
+      margin-bottom: 14px;
+    }
+
+    .poster-box {
+      width: 64px;
+      height: 80px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+
+    .booking-details {
+      flex: 1;
+    }
+
+    .show-name {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .detail-row {
+      display: flex;
+      margin: 8px 0;
+      font-size: 14px;
+    }
+
+    .detail-label {
+      color: #666;
+      width: 80px;
+      flex-shrink: 0;
+    }
+
+    .detail-value {
+      color: #333;
+      font-weight: 500;
+    }
+
+    .seat-info {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+
+    .seat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .seat-badge {
+      background: white;
+      border: 2px solid #667eea;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      font-weight: bold;
+      color: #667eea;
+      font-size: 14px;
+    }
+
+    .payment-methods {
+      display: grid;
+      gap: 12px;
+    }
+
+    .payment-method {
+      display: flex;
+      align-items: center;
+      padding: 18px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .payment-method:hover {
+      border-color: #667eea;
+      background: #f8f9fa;
+    }
+
+    .payment-method.active {
+      border-color: #667eea;
+      background: #e8eaf6;
+    }
+
+    .payment-method input[type="radio"] {
+      margin-right: 12px;
+      cursor: pointer;
+    }
+
+    .payment-icon {
+      font-size: 24px;
+      margin-right: 12px;
+    }
+
+    .payment-name {
+      flex: 1;
+      font-size: 15px;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .terms-section {
+      margin-top: 20px;
+    }
+
+    .terms-all {
+      background: #f8f9fa;
+      padding: 18px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 0;
+      cursor: pointer;
+    }
+
+    .checkbox-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-right: 12px;
+      cursor: pointer;
+    }
+
+    .checkbox-label {
+      flex: 1;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .checkbox-label.bold {
+      font-weight: bold;
+      font-size: 15px;
+    }
+
+    .terms-link {
+      color: #667eea;
+      text-decoration: none;
+      font-size: 13px;
+      margin-left: 8px;
+    }
+
+    .terms-link:hover {
+      text-decoration: underline;
+    }
+
+    .notice-box {
+      background: #fff8e1;
+      border-left: 4px solid #ffc107;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+
+    .notice-title {
+      font-weight: bold;
+      color: #f57c00;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .notice-text {
+      color: #666;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .payment-sidebar {
+      position: sticky;
+      top: 20px;
+      height: fit-content;
+    }
+
+    .summary-card {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .summary-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 15px 0;
+      font-size: 15px;
+    }
+
+    .price-label {
+      color: #666;
+    }
+
+    .price-value {
+      font-weight: 600;
+      color: #333;
+    }
+
+    .divider {
+      height: 1px;
+      background: #e0e0e0;
+      margin: 20px 0;
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0;
+      border-top: 2px solid #333;
+      margin-top: 15px;
+    }
+
+    .total-label {
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .total-value {
+      font-size: 28px;
+      font-weight: bold;
+      color: #667eea;
+    }
+
+    .btn-payment {
+      width: 100%;
+      padding: 18px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: all 0.3s;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-payment:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+    }
+
+    .btn-payment:active {
+      transform: translateY(0);
+    }
+
+    .btn-payment:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    @media (max-width: 768px) {
+      .payment-main {
+        grid-template-columns: 1fr;
+      }
+
+      .payment-sidebar {
+        position: static;
+      }
+
+      .booking-info {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+
+      .total-value {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="payment-container">
+  <div class="payment-header">
+    <div class="header-title">
+      💳 결제하기
+    </div>
+    <div class="header-subtitle">안전한 결제를 위해 정보를 확인해주세요</div>
+  </div>
+
+  <div class="payment-main">
+    <div class="payment-left">
+      <div class="section-card">
+        <div class="section-title">🦁 예매 정보</div>
+
+        <div class="booking-info">
+          <div class="poster-box">🎤</div>
+          <div class="booking-details">
+            <div class="show-name" th:text="${event.title}">공연명</div>
+            <div class="detail-row">
+              <span class="detail-label">공연장</span>
+              <span class="detail-value" th:text="${event.venue}">공연장</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">공연일시</span>
+              <span class="detail-value" th:text="${#temporals.format(event.startAt, 'yyyy년 MM월 dd일 (E) HH:mm')}">공연일시</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="seat-info">
+          <div class="section-title" style="font-size: 16px; margin-bottom: 0;">선택 좌석</div>
+          <div class="seat-grid">
+            <div class="seat-badge" th:each="seat : ${seats}" th:text="${seat.seatNo}">A5</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-title">💰 결제 수단</div>
+
+        <div class="payment-methods">
+          <label class="payment-method active">
+            <input type="radio" name="payment" value="free" checked>
+            <span class="payment-icon">💵</span>
+            <span class="payment-name">무료</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-title">📋 약관 동의</div>
+
+        <div class="terms-section">
+          <div class="terms-all">
+            <label class="checkbox-item">
+              <input type="checkbox" id="agree-all" onchange="toggleAll(this)">
+              <span class="checkbox-label bold">전체 동의</span>
+            </label>
+          </div>
+
+          <label class="checkbox-item">
+            <input type="checkbox" class="term-check" required>
+            <span class="checkbox-label">
+                                [필수] 개인정보 수집 및 이용 동의
+                                <a href="#" class="terms-link" onclick="showTerms('privacy'); return false;">보기</a>
+                            </span>
+          </label>
+
+          <label class="checkbox-item">
+            <input type="checkbox" class="term-check" required>
+            <span class="checkbox-label">
+                                [필수] 개인정보 제3자 제공 동의
+                                <a href="#" class="terms-link" onclick="showTerms('third'); return false;">보기</a>
+                            </span>
+          </label>
+
+          <label class="checkbox-item">
+            <input type="checkbox" class="term-check" required>
+            <span class="checkbox-label">
+                                [필수] 티켓 예매 및 취소 수수료 안내
+                                <a href="#" class="terms-link" onclick="showTerms('refund'); return false;">보기</a>
+                            </span>
+          </label>
+
+          <label class="checkbox-item">
+            <input type="checkbox" class="term-check">
+            <span class="checkbox-label">
+                                [선택] 마케팅 정보 수신 동의
+                                <a href="#" class="terms-link" onclick="showTerms('marketing'); return false;">보기</a>
+                            </span>
+          </label>
+        </div>
+
+        <div class="notice-box">
+          <div class="notice-title">⚠️ 결제 전 꼭 확인하세요</div>
+          <div class="notice-text">
+            • 티켓은 예매자 본인만 사용 가능합니다.<br>
+            • 예매 완료 후 이메일과 SMS로 티켓이 발송됩니다.<br>
+            • 선점 시간(10분) 내에 결제를 완료하지 않으면 자동으로 취소됩니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="payment-sidebar">
+      <div class="summary-card">
+        <div class="summary-title">결제 금액</div>
+
+        <div class="price-row">
+          <span class="price-label" th:text="'티켓 금액 (' + ${seats.size()} + '매)'">티켓 금액</span>
+          <span class="price-value" th:text="${#numbers.formatInteger(totalPrice, 0, 'COMMA')} + '원'">금액</span>
+        </div>
+
+        <div class="total-row">
+          <span class="total-label">최종 결제 금액</span>
+          <span class="total-value" th:text="${#numbers.formatInteger(totalPrice, 0, 'COMMA')} + '원'" id="final-price">금액</span>
+        </div>
+
+        <button class="btn-payment" id="payment-btn" onclick="processPayment()">
+          <span th:text="${#numbers.formatInteger(totalPrice, 0, 'COMMA')} + '원 결제하기'">결제하기</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script th:inline="javascript">
+  const EVENT_ID = /*[[${event.id}]]*/ 0;
+  const TOTAL_PRICE = /*[[${totalPrice}]]*/ 0;
+  // Thymeleaf로 좌석 번호 목록을 JS 배열로 주입
+  const SEAT_NUMBERS = /*[[${seats.![seatNo]}]]*/ [];
+  const EVENT_TITLE = /*[[${event.title}]]*/ '';
+  const EVENT_VENUE = /*[[${event.venue}]]*/ '';
+
+  document.querySelectorAll('.payment-method').forEach(method => {
+    method.addEventListener('click', function() {
+      document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('active'));
+      this.classList.add('active');
+      this.querySelector('input[type="radio"]').checked = true;
+    });
+  });
+
+  function toggleAll(checkbox) {
+    const checkboxes = document.querySelectorAll('.term-check');
+    checkboxes.forEach(cb => cb.checked = checkbox.checked);
+  }
+
+  document.querySelectorAll('.term-check').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+      const allChecked = Array.from(document.querySelectorAll('.term-check'))
+      .every(cb => cb.checked);
+      document.getElementById('agree-all').checked = allChecked;
+    });
+  });
+
+  function showTerms(type) {
+    const titles = {
+      'privacy': '개인정보 수집 및 이용',
+      'third': '개인정보 제3자 제공',
+      'refund': '취소 및 환불 규정',
+      'marketing': '마케팅 정보 수신'
+    };
+    alert(titles[type] + ' 약관 내용을 보여줍니다.');
+  }
+
+  async function processPayment() {
+    // 필수 약관 체크
+    const requiredTerms = Array.from(document.querySelectorAll('.term-check[required]'));
+    const allRequired = requiredTerms.every(cb => cb.checked);
+
+    if (!allRequired) {
+      alert('필수 약관에 모두 동의해주세요.');
+      return;
+    }
+
+    const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+    const btn = document.getElementById('payment-btn');
+    btn.disabled = true;
+    btn.textContent = '처리 중...';
+
+    // process 페이지로 이동하면서 예매 데이터를 sessionStorage에 저장
+    // 실제 결제/좌석배정 API 호출은 process 페이지에서 단계별로 수행
+    sessionStorage.setItem('paymentData', JSON.stringify({
+      eventId: EVENT_ID,
+      seatNumbers: SEAT_NUMBERS,
+      paymentMethod: paymentMethod,
+      totalPrice: TOTAL_PRICE,
+      eventTitle: EVENT_TITLE,
+      eventVenue: EVENT_VENUE,
+      seatCount: SEAT_NUMBERS.length
+    }));
+
+    // 페이지 이탈 경고 비활성화 후 이동
+    window.removeEventListener('beforeunload', beforeUnloadHandler);
+    window.location.href = '/reservation-process';
+  }
+
+  // 페이지 이탈 경고
+  function beforeUnloadHandler(e) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+  window.addEventListener('beforeunload', beforeUnloadHandler);
+</script>
+</body>
+</html>

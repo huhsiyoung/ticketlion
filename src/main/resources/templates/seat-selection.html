@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>티켓사자</title>
+
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body{
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+      background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    .header{
+      background:transparent;
+      color:#fff;
+      padding:20px;
+    }
+    .header-content{ max-width:500px; margin:0 auto; }
+    .header h1{ font-size:24px; font-weight:700; margin-bottom:8px; }
+    .header-subtitle{ font-size:14px; opacity:.9; }
+
+    .container{
+      max-width:500px;
+      width:min(500px, 100%);
+      margin:-15px auto 0;
+      background:#fff;
+      border-radius:20px 20px 0 0;
+      padding:20px;
+      min-height:calc(100vh - 135px);
+      box-shadow:0 -4px 12px rgba(0,0,0,.05);
+      overflow:hidden;
+    }
+
+    .event-info{
+      background:#f8fafc;
+      padding:15px;
+      border-radius:12px;
+      margin-bottom:16px;
+      border:1px solid #e2e8f0;
+    }
+    .event-info-row{
+      display:flex; justify-content:space-between;
+      margin:8px 0; font-size:14px;
+      gap:10px;
+    }
+    .info-label{ color:#64748b; font-weight:500; white-space:nowrap; }
+    .info-value{ color:#1e293b; font-weight:600; text-align:right; }
+
+    .section-title{
+      color:#1e293b;
+      font-size:16px; font-weight:700;
+      margin-bottom:12px;
+      display:flex; align-items:center; gap:8px;
+    }
+    .section-title::before{
+      content:'';
+      width:4px; height:16px;
+      background:#667eea; border-radius:2px;
+    }
+
+    .screen{
+      background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      color:#fff;
+      text-align:center;
+      padding:10px;
+      margin-bottom:12px;
+      border-radius:8px;
+      font-weight:600;
+      font-size:13px;
+      letter-spacing:1px;
+    }
+
+    .seats-wrapper{
+      overflow:hidden;
+      margin-bottom:12px;
+      padding:0;
+    }
+
+    .seats{
+      display:grid;
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+      gap:4px;
+      width:100%;
+      margin:0 auto;
+    }
+
+    .seat{
+      aspect-ratio:1;
+      border:1px solid #e2e8f0;
+      border-radius:8px;
+      background:#fff;
+      cursor:pointer;
+      transition:all .2s;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:clamp(8px, 2vw, 11px);
+      color:#64748b;
+      min-height:clamp(22px, 5.6vw, 34px);
+      -webkit-tap-highlight-color:transparent;
+      font-weight:600;
+      overflow:hidden;
+    }
+
+    .seat:active:not(.occupied){ transform:scale(.95); }
+
+    .seat.selected{
+      background:#667eea;
+      border-color:#667eea;
+      color:#fff;
+      box-shadow:0 2px 8px rgba(102,126,234,.4);
+    }
+    .seat.occupied{
+      background:#f1f5f9;
+      border-color:#cbd5e1;
+      cursor:not-allowed;
+      color:#94a3b8;
+    }
+
+    .legend{
+      display:flex;
+      gap:12px;
+      justify-content:center;
+      margin-bottom:16px;
+      flex-wrap:wrap;
+      font-size:12px;
+    }
+    .legend-item{ display:flex; align-items:center; gap:6px; color:#64748b; }
+    .legend-box{
+      width:20px; height:20px;
+      border-radius:6px;
+      border:2px solid;
+      flex-shrink:0;
+    }
+    .legend-box.available{ background:#fff; border-color:#e2e8f0; }
+    .legend-box.selected{ background:#667eea; border-color:#667eea; }
+    .legend-box.occupied{ background:#f1f5f9; border-color:#cbd5e1; }
+
+    .summary{
+      background:#f8fafc;
+      padding:16px;
+      border-radius:12px;
+      margin-bottom:12px;
+      border:1px solid #e2e8f0;
+    }
+    .summary-item{
+      display:flex; justify-content:space-between;
+      margin:10px 0; color:#1e293b; font-size:14px;
+      gap:10px;
+    }
+    .summary-label{ color:#64748b; font-weight:500; }
+    .summary-value{ font-weight:700; color:#1e293b; text-align:right; }
+
+    .summary-total{
+      display:flex; justify-content:space-between;
+      padding-top:12px;
+      border-top:2px solid #e2e8f0;
+      margin-top:12px;
+      gap:10px;
+    }
+    .summary-total .summary-label{ font-size:15px; font-weight:700; color:#1e293b; }
+    .summary-total .summary-value{ font-size:18px; color:#667eea; text-align:right; }
+
+    .btn-purchase{
+      width:100%;
+      padding:16px;
+      background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      color:#fff;
+      border:none;
+      border-radius:12px;
+      font-size:16px;
+      font-weight:700;
+      cursor:pointer;
+      transition:all .3s;
+      -webkit-tap-highlight-color:transparent;
+      box-shadow:0 4px 12px rgba(102,126,234,.4);
+    }
+    .btn-purchase:active{
+      transform:translateY(1px);
+      box-shadow:0 2px 8px rgba(102,126,234,.4);
+    }
+    .btn-purchase:disabled{
+      background:#cbd5e1;
+      cursor:not-allowed;
+      box-shadow:none;
+    }
+
+    /* 로딩 스피너 */
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+    .loading-overlay.active {
+      display: flex;
+    }
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @media (min-width:768px){
+      .header{ padding:40px 20px 30px; }
+      .header h1{ font-size:32px; }
+      .header-subtitle{ font-size:16px; }
+
+      .container{
+        margin:-20px auto 0;
+        padding:30px;
+        min-height:auto;
+      }
+
+      .seats{ max-width:420px; gap:6px; }
+
+      .seat{
+        min-height:40px;
+        font-size:11px;
+      }
+      .seat:hover:not(.occupied){
+        transform:scale(1.05);
+        border-color:#667eea;
+      }
+      .btn-purchase:hover{
+        transform:translateY(-2px);
+        box-shadow:0 6px 16px rgba(102,126,234,.5);
+      }
+      .btn-purchase:active{ transform:translateY(0); }
+    }
+  </style>
+  <meta name="_csrf" th:content="${_csrf.token}">
+  <meta name="_csrf_header" th:content="${_csrf.headerName}">
+</head>
+
+<body>
+<div class="loading-overlay" id="loading-overlay">
+  <div class="spinner"></div>
+</div>
+
+<div class="header">
+  <div class="header-content">
+    <h1>좌석 선택</h1>
+    <p class="header-subtitle">좌석을 선택해주세요</p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="event-info">
+    <div class="event-info-row">
+      <span class="info-label">공연명</span>
+      <span class="info-value" th:text="${event.title}">공연명</span>
+    </div>
+
+    <div class="event-info-row">
+      <span class="info-label">일시</span>
+      <span class="info-value" th:text="${#temporals.format(event.startAt, 'yyyy.MM.dd HH:mm')}">2025.03.22 18:00</span>
+    </div>
+
+    <div class="event-info-row">
+      <span class="info-label">장소</span>
+      <span class="info-value" th:text="${event.venue}">KSPO DOME</span>
+    </div>
+
+    <div class="event-info-row">
+      <span class="info-label">가격</span>
+      <span class="info-value"
+            th:text="${#numbers.formatInteger(event.price, 0, 'COMMA')} + '원'">110,000원</span>
+    </div>
+  </div>
+
+  <div class="section-title">좌석 선택</div>
+  <div class="screen">STAGE</div>
+
+  <div class="seats-wrapper">
+    <div class="seats" id="seats"></div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-box available"></div><span>선택가능</span></div>
+    <div class="legend-item"><div class="legend-box selected"></div><span>선택됨</span></div>
+    <div class="legend-item"><div class="legend-box occupied"></div><span>예매완료</span></div>
+  </div>
+
+  <div class="summary">
+    <div class="summary-item">
+      <span class="summary-label">선택한 좌석</span>
+      <span class="summary-value" id="selected-seats">없음</span>
+    </div>
+    <div class="summary-item">
+      <span class="summary-label">매수</span>
+      <span class="summary-value" id="ticket-count">0매</span>
+    </div>
+    <div class="summary-total">
+      <span class="summary-label">총 결제금액</span>
+      <span class="summary-value" id="total-price">0원</span>
+    </div>
+  </div>
+
+  <button class="btn-purchase" id="purchase-btn" disabled>예매하기</button>
+</div>
+
+<script th:inline="javascript">
+  // 서버에서 전달받은 데이터
+  const EVENT_ID = /*[[${event.id}]]*/ 0;
+  const PRICE = /*[[${event.price}]]*/ 100000;
+  const MAX_SELECT = /*[[${maxSelect}]]*/ 2;
+  const PENDING_COUNT = /*[[${pendingCount}]]*/ 0;
+  const seatsData = JSON.parse(/*[[${seats}]]*/ '[]');
+
+  let selectedSeats = [];
+  let isSubmitting = false;  // 중복 제출 방지
+  const seatsContainer = document.getElementById('seats');
+  const loadingOverlay = document.getElementById('loading-overlay');
+
+  // 좌석 맵 생성 (seatNo -> seat 객체)
+  const seatMap = new Map();
+  seatsData.forEach(seat => {
+    seatMap.set(seat.seatNo, seat);
+  });
+
+  // 좌석 번호 추출 및 정렬
+  const seatNumbers = seatsData.map(s => s.seatNo).sort((a, b) => {
+    const rowA = a.charAt(0);
+    const rowB = b.charAt(0);
+    const numA = parseInt(a.substring(1));
+    const numB = parseInt(b.substring(1));
+
+    if (rowA !== rowB) {
+      return rowA.localeCompare(rowB);
+    }
+    return numA - numB;
+  });
+
+  // 좌석 렌더링
+  seatNumbers.forEach(seatNo => {
+    const seatData = seatMap.get(seatNo);
+    const seat = document.createElement('div');
+    seat.className = 'seat';
+    seat.dataset.seatId = seatData.seatId;
+    seat.dataset.seatNo = seatData.seatNo;
+    seat.textContent = seatData.seatNo;
+
+    // 좌석 상태에 따라 클래스 적용
+    if (seatData.status === 'RESERVED') {
+      seat.classList.add('occupied');
+    } else if (seatData.status === 'AVAILABLE') {
+      seat.addEventListener('click', toggleSeat);
+    }
+
+    seatsContainer.appendChild(seat);
+  });
+
+  function toggleSeat(e) {
+    const seat = e.target;
+    const seatId = seat.dataset.seatId;
+    const seatNo = seat.dataset.seatNo;
+
+    if (seat.classList.contains('selected')) {
+      // 선택 해제
+      seat.classList.remove('selected');
+      selectedSeats = selectedSeats.filter(s => s.seatId !== seatId);
+    } else {
+      // 선택
+      if (selectedSeats.length < MAX_SELECT) {
+        seat.classList.add('selected');
+        selectedSeats.push({ seatId, seatNo });
+      } else {
+        if (PENDING_COUNT > 0) {
+          alert(`현재 결제 대기 중인 좌석 ${PENDING_COUNT}석이 있어 추가로 ${MAX_SELECT}석만 선택할 수 있습니다.\n다른 좌석으로 변경하려면 기존 결제 대기를 취소한 뒤 다시 선택해주세요.`);
+        } else {
+          alert(`최대 ${MAX_SELECT}개의 좌석만 선택할 수 있습니다.`);
+        }
+      }
+    }
+
+    updateSummary();
+  }
+
+  function updateSummary() {
+    const selectedSeatsEl = document.getElementById('selected-seats');
+    const ticketCountEl = document.getElementById('ticket-count');
+    const totalPriceEl = document.getElementById('total-price');
+    const purchaseBtn = document.getElementById('purchase-btn');
+
+    if (selectedSeats.length === 0) {
+      selectedSeatsEl.textContent = '없음';
+      purchaseBtn.disabled = true;
+    } else {
+      selectedSeatsEl.textContent = selectedSeats.map(s => s.seatNo).join(', ');
+      purchaseBtn.disabled = false;
+    }
+
+    ticketCountEl.textContent = `${selectedSeats.length}매`;
+    totalPriceEl.textContent = `${(selectedSeats.length * PRICE).toLocaleString()}원`;
+  }
+
+  // 좌석 상태 새로고침 함수
+  async function refreshSeatStatus() {
+    try {
+      const response = await fetch(`/api/events/${EVENT_ID}/seats`);
+      if (!response.ok) {
+        throw new Error('좌석 정보 조회 실패');
+      }
+
+      const updatedSeats = await response.json();
+
+      // 기존 선택 초기화
+      selectedSeats = [];
+
+      // 좌석 상태 업데이트
+      updatedSeats.forEach(seatData => {
+        const seatElement = document.querySelector(`[data-seat-no="${seatData.seatNo}"]`);
+        if (seatElement) {
+          // 기존 클래스 제거
+          seatElement.classList.remove('selected', 'occupied');
+
+          // 새 상태 적용
+          if (seatData.status === 'RESERVED') {
+            seatElement.classList.add('occupied');
+            // 새 요소 생성 (클릭 이벤트 없음)
+            const newSeat = seatElement.cloneNode(true);
+            seatElement.parentNode.replaceChild(newSeat, seatElement);
+          } else if (seatData.status === 'AVAILABLE') {
+            // AVAILABLE 좌석은 클릭 이벤트 재등록
+            const newSeat = seatElement.cloneNode(true);
+            newSeat.addEventListener('click', toggleSeat);
+            seatElement.parentNode.replaceChild(newSeat, seatElement);
+          }
+        }
+      });
+
+      updateSummary();
+
+    } catch (error) {
+      console.error('좌석 상태 새로고침 실패:', error);
+    }
+  }
+
+  // 예매하기 버튼 클릭
+  document.getElementById('purchase-btn').addEventListener('click', async () => {
+    if (selectedSeats.length === 0) {
+      return;
+    }
+
+    // 중복 클릭 방지
+    if (isSubmitting) {
+      return;
+    }
+    isSubmitting = true;
+
+    const seatIds = selectedSeats.map(s => s.seatId);
+
+    // 로딩 표시
+    loadingOverlay.classList.add('active');
+
+    try {
+      // 좌석 선점 API 호출
+      const response = await fetch(`/events/${EVENT_ID}/holds`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          seatIds: seatIds
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || '좌석 선점에 실패했습니다.');
+      }
+
+      const result = await response.json();
+
+      // ✅ 성공 시 예매 페이지로 자동 이동
+      window.location.href = `/events/${EVENT_ID}/reservations`;
+
+    } catch (error) {
+      console.error('Error:', error);
+
+      // ✅ 실패 시: 에러 메시지 표시 + 좌석 상태 새로고침 + 현재 페이지 유지
+      alert(error.message || '좌석 선점 중 오류가 발생했습니다.\n좌석 상태를 새로고침합니다.');
+
+      // 좌석 상태 새로고침
+      await refreshSeatStatus();
+
+      // 로딩 해제 및 플래그 리셋
+      loadingOverlay.classList.remove('active');
+      isSubmitting = false;
+    }
+  });
+</script>
+</body>
+</html>

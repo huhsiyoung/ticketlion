@@ -1,0 +1,9 @@
+{
+  "defaultModel": "sonnet",
+  "approvalPolicy": "on-request",
+  "includeGitHistory": true,
+  "autoApplyChanges": false,
+  "logLevel": "info",
+  "maxContextTokens" : 3000,
+  "claudeMdPath" : "./CLAUDE.md"
+}
