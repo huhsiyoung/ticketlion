@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>티켓사자</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* 헤더 */
+    header {
+      position: relative;
+      z-index: 10;
+      padding: 20px 0;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+    }
+
+    nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+    }
+
+    .nav-menu {
+      display: flex;
+      gap: 30px;
+      list-style: none;
+    }
+
+    .nav-menu a,
+    .nav-menu button {
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+      font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 600;
+      transition: opacity 0.3s;
+      background: transparent;
+      border: none;
+      padding: 0;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .nav-menu a:hover,
+    .nav-menu button:hover {
+      opacity: 0.8;
+    }
+
+    /* 메인 컨테이너 */
+    .event-container {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* 페이지 타이틀 */
+    .page-header {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .page-title {
+      font-size: 32px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .page-subtitle {
+      font-size: 16px;
+      color: #666;
+    }
+
+    /* 필터 섹션 */
+    .filter-section {
+      background: white;
+      border-radius: 20px;
+      padding: 25px;
+      margin-bottom: 30px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .filter-btn {
+      padding: 10px 20px;
+      background: #f8f9fa;
+      color: #666;
+      border: 2px solid #e0e0e0;
+      border-radius: 25px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .filter-btn:hover {
+      border-color: #667eea;
+      color: #667eea;
+    }
+
+    .filter-btn.active {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 250px;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 12px 45px 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 25px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .search-input:focus {
+      border-color: #667eea;
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #999;
+      font-size: 18px;
+    }
+
+    /* 이벤트 그리드 */
+    .event-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    .event-card {
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .event-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+    }
+
+    .event-poster {
+      width: 100%;
+      height: 260px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .poster-image {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 80px;
+    }
+
+    .event-badge {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: rgba(255, 255, 255, 0.95);
+      color: #667eea;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: bold;
+      backdrop-filter: blur(10px);
+    }
+
+    .event-badge.hot {
+      background: #ff6b6b;
+      color: white;
+    }
+
+    .event-badge.new {
+      background: #4caf50;
+      color: white;
+    }
+
+    .event-badge.sale {
+      background: #ffa726;
+      color: white;
+    }
+
+    .d-day {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: bold;
+      backdrop-filter: blur(10px);
+    }
+
+    .event-info {
+      padding: 25px;
+    }
+
+    .event-category {
+      display: inline-block;
+      color: #667eea;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .event-title {
+      font-size: 22px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 15px;
+      line-height: 1.3;
+    }
+
+    .event-detail {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 10px 0;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .detail-icon {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .event-price {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #e0e0e0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .price-label {
+      font-size: 14px;
+      color: #999;
+    }
+
+    .price-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #667eea;
+    }
+
+    .event-actions {
+      padding: 0 25px 25px;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: none;
+      text-align: center;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #667eea;
+      border: 2px solid #667eea;
+      flex: 0 0 auto;
+      width: 50px;
+    }
+
+    .btn-secondary:hover {
+      background: #f8f9fa;
+    }
+
+    /* 빈 상태 */
+    .empty-state {
+      background: white;
+      border-radius: 20px;
+      padding: 80px 40px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .empty-icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+
+    .empty-text {
+      font-size: 20px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .empty-subtext {
+      font-size: 16px;
+      color: #999;
+    }
+
+    /* 로딩 상태 */
+    .loading {
+      text-align: center;
+      padding: 60px;
+      color: white;
+      font-size: 18px;
+    }
+
+    /* 모바일 반응형 */
+    @media (max-width: 768px) {
+      .page-header {
+        padding: 20px;
+      }
+
+      .page-title {
+        font-size: 24px;
+      }
+
+      .filter-section {
+        padding: 20px;
+      }
+
+      .filter-group {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .search-box {
+        width: 100%;
+      }
+
+      .event-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .event-poster {
+        height: 220px;
+      }
+
+      .poster-image {
+        font-size: 60px;
+      }
+
+      .event-title {
+        font-size: 18px;
+      }
+
+      .price-value {
+        font-size: 20px;
+      }
+    }
+
+    /* 페이지네이션 */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      padding: 40px 0;
+    }
+
+    .page-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: white;
+      border: 2px solid #e0e0e0;
+      color: #666;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .page-btn:hover {
+      border-color: #667eea;
+      color: #667eea;
+    }
+
+    .page-btn.active {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+  </style>
+</head>
+<body>
+<!-- 헤더 -->
+<header>
+  <nav>
+    <a href="/events" class="logo">
+      <img src="/images/logo.webp" alt="티켓사자 로고" class="logo-img">
+      티켓사자
+    </a>
+
+    <ul class="nav-menu">
+      <li><a href="/reservation-details">예매 내역</a></li>
+      <li>
+        <form th:action="@{/logout}" method="post">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+          <button type="submit">로그아웃</button>
+        </form>
+      </li>
+    </ul>
+
+  </nav>
+</header>
+
+<!-- 메인 컨테이너 -->
+<div class="event-container">
+  <!-- 페이지 헤더 -->
+  <div class="page-header">
+    <h1 class="page-title">🎤 티켓 예매</h1>
+    <p class="page-subtitle">당신을 위한 행복한 시간</p>
+  </div>
+
+  <!-- 필터 섹션 -->
+  <div class="filter-section">
+    <div class="filter-group">
+      <div class="search-box">
+        <input type="text" class="search-input" placeholder="아티스트, 공연명 검색..." id="search-input">
+        <span class="search-icon">🔍</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 이벤트 그리드 -->
+  <div class="event-grid" id="event-grid">
+    <div class="event-card" th:each="event : ${events}">
+      <div class="event-poster">
+        <div class="poster-image"
+             th:attr="data-theme=${event.themeColor}"
+             th:text="${event.thumbnailEmoji}">
+        </div>
+        <div class="d-day"
+             th:attr="data-startat=${#temporals.format(event.startAt, 'yyyy-MM-dd''T''HH:mm:ss')}">
+          2026.02.05 12:00
+        </div>
+      </div>
+
+      <div class="event-info">
+        <div class="event-category" th:text="${event.category}">EVENT</div>
+        <h3 class="event-title" th:text="${event.title}">타이틀</h3>
+
+        <div class="event-detail">
+          <span class="detail-icon">📍</span>
+          <span th:text="${event.venue}">장소</span>
+        </div>
+
+        <div class="event-detail">
+          <span class="detail-icon">🗓️</span>
+          <span th:text="${#temporals.format(event.startAt, 'yyyy.MM.dd')}">날짜</span>
+        </div>
+
+        <div class="event-detail">
+          <span class="detail-icon">🕐</span>
+          <span th:text="${#temporals.format(event.startAt, 'HH:mm') + ' 시작'}">시간</span>
+        </div>
+
+        <div class="event-price">
+          <span class="price-label">가격</span>
+          <span class="price-value"
+                th:text="${#numbers.formatInteger(event.price, 0, 'COMMA')} + '원'">110,000원~</span>
+        </div>
+      </div>
+
+      <div class="event-actions">
+        <button class="btn btn-secondary" type="button">❤️</button>
+        <a class="btn btn-primary" th:href="@{/events/{id}/seats(id=${event.id})}">예매하기</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 페이지네이션 -->
+  <div class="pagination" id="pagination">
+    <button class="page-btn active">1</button>
+    <button class="page-btn">2</button>
+    <button class="page-btn">3</button>
+    <button class="page-btn">4</button>
+    <button class="page-btn">→</button>
+  </div>
+</div>
+
+<script>
+  let currentGenre = 'all';
+  let searchQuery = '';
+
+  // 이벤트 카드 렌더링
+  function renderEvents() {
+    const grid = document.getElementById('event-grid');
+
+    // 필터링
+    let filteredEvents = events;
+
+    if (currentGenre !== 'all') {
+      filteredEvents = filteredEvents.filter(e => e.genre === currentGenre);
+    }
+
+    if (searchQuery) {
+      filteredEvents = filteredEvents.filter(e =>
+          e.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          e.artist.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // 빈 상태
+    if (filteredEvents.length === 0) {
+      grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div class="empty-icon">🎵</div>
+                        <div class="empty-text">검색 결과가 없습니다</div>
+                        <div class="empty-subtext">다른 검색어로 다시 시도해보세요</div>
+                    </div>
+                `;
+      return;
+    }
+
+    // 이벤트 카드 생성
+    grid.innerHTML = filteredEvents.map(eventItem => `
+                <div class="event-card" onclick="viewEventDetail(${eventItem.id})">
+                    <div class="event-poster">
+                        <div class="poster-image" style="background: ${eventItem.gradient}">
+                            ${eventItem.emoji}
+                        </div>
+                        <div class="d-day">${eventItem.dday}</div>
+                    </div>
+                    <div class="event-info">
+                        <div class="event-category">${eventItem.category}</div>
+                        <h3 class="event-title">${eventItem.title}</h3>
+                        <div class="event-detail">
+                            <span class="detail-icon">📍</span>
+                            <span>${eventItem.venue}</span>
+                        </div>
+                        <div class="event-detail">
+                            <span class="detail-icon">🗓️</span>
+                            <span>${eventItem.date}</span>
+                        </div>
+                        <div class="event-detail">
+                            <span class="detail-icon">🕐</span>
+                            <span>${eventItem.time} 시작</span>
+                        </div>
+                        <div class="event-price">
+                            <span class="price-label">가격</span>
+                            <span class="price-value">${eventItem.price}</span>
+                        </div>
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn btn-secondary" onclick="event.stopPropagation(); addToWishlist(${eventItem.id})">
+                            ❤️
+                        </button>
+                        <button class="btn btn-primary" onclick="event.stopPropagation(); bookEvent(${eventItem.id})">
+                            예매하기
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+  }
+
+  // 검색
+  document.getElementById('search-input').addEventListener('input', function(e) {
+    searchQuery = e.target.value;
+    renderEvents();
+  });
+
+  // 이벤트 상세 보기
+  function viewEventDetail(id) {
+    const eventItem = events.find(e => e.id === id);
+    alert(`"${eventItem.title}" 상세 페이지로 이동합니다.`);
+    // window.location.href = `event-detail.html?id=${id}`;
+  }
+
+  // 예매하기
+  function bookEvent(id) {
+    const eventItem = events.find(e => e.id === id);
+
+    if (confirm(`"${eventItem.title}" 이벤트를 예매하시겠습니까?`)) {
+      window.location.href = `/events/${id}/seats`;
+    }
+  }
+
+  // 위시리스트 추가
+  function addToWishlist(id) {
+    const eventItem = events.find(e => e.id === id);
+    alert(`"${eventItem.title}"이(가) 위시리스트에 추가되었습니다.`);
+  }
+
+  // 디데이 카운터
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".d-day[data-startat]").forEach(el => {
+      const start = new Date(el.dataset.startat);
+      const today = new Date();
+
+      // 날짜 기준 D-day(시간 영향 제거)
+      start.setHours(0,0,0,0);
+      today.setHours(0,0,0,0);
+
+      const diffDays = Math.ceil((start - today) / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 0) el.textContent = "D-DAY";
+      else if (diffDays > 0) el.textContent = `D-${diffDays}`;
+      else el.textContent = `D+${Math.abs(diffDays)}`; // 지난 공연이면
+    });
+  });
+
+  // 이벤트 배경 지정
+  const gradientMap = {
+    g1:  'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+    g2:  'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+    g3:  'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+    g4:  'linear-gradient(135deg, #ff6e7f 0%, #bfe9ff 100%)',
+    g5:  'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+    g6:  'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+    g7:  'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+    g8:  'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
+    g9:  'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+    g10: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    g11: 'linear-gradient(135deg, #434343 0%, #000000 100%)',
+    g12: 'linear-gradient(135deg, #f2994a 0%, #f2c94c 100%)'
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.poster-image').forEach(el => {
+      const key = el.dataset.theme;   // g1~g12
+      el.style.background = gradientMap[key] ?? gradientMap.g10;
+    });
+  });
+
+  // 초기 렌더링
+  renderEvents();
+</script>
+</body>
+</html>

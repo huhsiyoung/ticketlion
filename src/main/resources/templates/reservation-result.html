@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>티켓사자 - 예매 완료</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    .completion-container {
+      position: relative;
+      z-index: 1;
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 700px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .success-icon {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .checkmark-circle {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto;
+      position: relative;
+      animation: scaleIn 0.5s ease-out;
+    }
+
+    @keyframes scaleIn {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    .checkmark {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: #4caf50;
+      position: relative;
+    }
+
+    .checkmark::after {
+      content: '';
+      position: absolute;
+      width: 35px;
+      height: 70px;
+      border: solid white;
+      border-width: 0 8px 8px 0;
+      transform: rotate(45deg);
+      top: 15px;
+      left: 42px;
+    }
+
+    .completion-title {
+      text-align: center;
+      font-size: 32px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .completion-subtitle {
+      text-align: center;
+      font-size: 16px;
+      color: #666;
+      margin-bottom: 40px;
+    }
+
+    /* 예매번호 배너 */
+    .booking-number {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .booking-number-label {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-bottom: 8px;
+    }
+
+    .booking-number-value {
+      font-size: 24px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      font-family: 'Courier New', monospace;
+    }
+
+    /* 티켓 미리보기 */
+    .ticket-preview {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 30px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ticket-preview::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .ticket-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .ticket-title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .ticket-info {
+      font-size: 14px;
+      opacity: 0.95;
+      line-height: 1.8;
+    }
+
+    .ticket-qr {
+      text-align: center;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 2px dashed rgba(255, 255, 255, 0.3);
+    }
+
+    .qr-placeholder {
+      display: inline-flex;
+      width: 120px;
+      height: 120px;
+      background: white;
+      border-radius: 10px;
+      align-items: center;
+      justify-content: center;
+      font-size: 60px;
+    }
+
+    /* 예매 정보 */
+    .booking-details {
+      background: #f8f9fa;
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 30px;
+    }
+
+    .detail-section {
+      margin-bottom: 25px;
+    }
+
+    .detail-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .detail-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 12px 0;
+      font-size: 15px;
+    }
+
+    .info-label {
+      color: #666;
+      font-weight: 500;
+    }
+
+    .info-value {
+      font-weight: 600;
+      color: #333;
+      text-align: right;
+    }
+
+    .info-value.highlight {
+      color: #667eea;
+      font-size: 16px;
+    }
+
+    /* 좌석 태그 */
+    .seats-display {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .seat-tag {
+      background: white;
+      border: 2px solid #667eea;
+      color: #667eea;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    /* 안내 박스 */
+    .info-box {
+      background: #e8f4fd;
+      border-left: 4px solid #2196F3;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+    }
+
+    .info-box-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: bold;
+      color: #1976d2;
+      margin-bottom: 12px;
+      font-size: 16px;
+    }
+
+    .info-box-content {
+      font-size: 14px;
+      color: #1565c0;
+      line-height: 1.8;
+    }
+
+    .info-box-content ul {
+      margin-left: 20px;
+      margin-top: 10px;
+    }
+
+    .info-box-content li {
+      margin: 6px 0;
+    }
+
+    /* 버튼 */
+    .button-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      padding: 16px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+      text-decoration: none;
+      border: none;
+      display: block;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-outline {
+      background: white;
+      color: #666;
+      border: 2px solid #e0e0e0;
+    }
+
+    .btn-outline:hover {
+      background: #f8f9fa;
+      border-color: #667eea;
+      color: #667eea;
+      transform: translateY(-2px);
+    }
+
+    .btn-full {
+      grid-column: 1 / -1;
+    }
+
+    .btn:active { transform: translateY(0); }
+
+    .text-link {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .text-link a {
+      color: #667eea;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .text-link a:hover { text-decoration: underline; }
+
+    /* 반응형 */
+    @media (max-width: 768px) {
+      .completion-container { padding: 30px 20px; }
+      .completion-title { font-size: 26px; }
+      .checkmark-circle { width: 100px; height: 100px; }
+      .checkmark { width: 100px; height: 100px; }
+      .checkmark::after { width: 30px; height: 60px; left: 35px; }
+      .booking-details { padding: 20px; }
+      .button-group { grid-template-columns: 1fr; }
+      .btn-full { grid-column: 1; }
+      .booking-number-value { font-size: 20px; }
+      .ticket-title { font-size: 20px; }
+    }
+
+    @media print {
+      body { background: white; }
+      .button-group, .text-link { display: none; }
+      .completion-container { box-shadow: none; max-width: 100%; }
+    }
+
+    #fireworks {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+  </style>
+</head>
+<body>
+<canvas id="fireworks"></canvas>
+
+<div class="completion-container">
+  <!-- 성공 아이콘 -->
+  <div class="success-icon">
+    <div class="checkmark-circle">
+      <div class="checkmark"></div>
+    </div>
+  </div>
+
+  <h1 class="completion-title">예매가 완료되었습니다! 🎉</h1>
+  <p class="completion-subtitle">소중한 시간을 함께해 주셔서 감사합니다</p>
+
+  <!-- 예매번호 -->
+  <div class="booking-number">
+    <div class="booking-number-label">예매번호</div>
+    <!-- TK + 예매 ID를 0패딩으로 표시 (예: TK00000042) -->
+    <div class="booking-number-value"
+         th:text="'TK' + ${#strings.toString(reservation.id).length() < 8 ? '00000000'.substring(#strings.toString(reservation.id).length()) + reservation.id : reservation.id}">
+      TK00000001
+    </div>
+  </div>
+
+  <!-- 티켓 미리보기 -->
+  <div class="ticket-preview">
+    <div class="ticket-content">
+      <div class="ticket-title"
+           th:text="${reservation.seat.event.thumbnailEmoji} + ' ' + ${reservation.seat.event.title}">
+        🎤 공연명
+      </div>
+      <div class="ticket-info">
+        📍 <span th:text="${reservation.seat.event.venue}">공연장</span><br>
+        🗓️ <span th:text="${#temporals.format(reservation.seat.event.startAt, 'yyyy년 MM월 dd일 (E) HH:mm')}">공연일시</span><br>
+        🎫 좌석 <strong th:text="${#strings.listJoin(reservations.![seat.seatNo], ', ')}">A5</strong>
+      </div>
+      <div class="ticket-qr">
+        <div class="qr-placeholder">📱</div>
+        <div style="margin-top: 10px; font-size: 12px; opacity: 0.9;">
+          모바일 티켓으로 간편하게 입장하세요
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 예매 정보 -->
+  <div class="booking-details">
+    <!-- 공연 정보 -->
+    <div class="detail-section">
+      <div class="detail-header">🎫 공연 정보</div>
+      <div class="info-row">
+        <span class="info-label">공연명</span>
+        <span class="info-value" th:text="${reservation.seat.event.title}">공연명</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">공연장</span>
+        <span class="info-value" th:text="${reservation.seat.event.venue}">공연장</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">공연일시</span>
+        <span class="info-value"
+              th:text="${#temporals.format(reservation.seat.event.startAt, 'yyyy년 MM월 dd일 (E) HH:mm')}">
+                        공연일시
+                    </span>
+      </div>
+    </div>
+
+    <!-- 좌석 정보 -->
+    <div class="detail-section">
+      <div class="detail-header">💺 좌석 정보</div>
+      <div class="info-row">
+        <span class="info-label">매수</span>
+        <span class="info-value" th:text="${reservations.size()} + '매'">1매</span>
+      </div>
+      <div class="seats-display">
+        <div class="seat-tag" th:each="r : ${reservations}" th:text="${r.seat.seatNo}">A5</div>
+      </div>
+    </div>
+
+    <!-- 결제 정보 -->
+    <div class="detail-section">
+      <div class="detail-header">💳 결제 정보</div>
+      <div class="info-row" style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #e0e0e0;">
+        <span class="info-label" style="font-size: 16px;">최종 결제 금액</span>
+        <span class="info-value highlight" style="font-size: 20px;">0원</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">결제 수단</span>
+        <span class="info-value">무료 결제</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">예매 일시</span>
+        <span class="info-value"
+              th:text="${#temporals.format(reservation.reservedAt.atZone(T(java.time.ZoneId).of('Asia/Seoul')).toLocalDateTime(), 'yyyy-MM-dd HH:mm:ss')}">
+                        예매 일시
+                    </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 안내사항 -->
+  <div class="info-box">
+    <div class="info-box-title">ℹ️ 안내사항</div>
+    <div class="info-box-content">
+      <ul>
+        <li>모바일 티켓을 공연장 입구에서 제시하시면 됩니다.</li>
+        <li>티켓은 예매자 본인만 사용 가능합니다.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 버튼 그룹 -->
+  <div class="button-group">
+    <a href="/reservation-details" class="btn btn-outline">
+      📋 예매 내역 확인하기
+    </a>
+    <button class="btn btn-outline" onclick="shareTicket()">
+      📤 공유하기
+    </button>
+    <a href="/events" class="btn btn-primary btn-full">
+      🎭 다른 공연 보러가기
+    </a>
+  </div>
+</div>
+
+<script th:inline="javascript">
+  const RESERVATION_ID = /*[[${reservation.id}]]*/ 0;
+
+  function shareTicket() {
+    if (navigator.share) {
+      navigator.share({
+        title: '티켓사자 예매 완료',
+        text: '예매가 완료되었습니다! 예매번호: TK' + String(RESERVATION_ID).padStart(8, '0'),
+        url: window.location.href
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.href)
+      .then(() => alert('링크가 클립보드에 복사되었습니다.'))
+      .catch(() => alert('공유 기능이 지원되지 않는 브라우저입니다.'));
+    }
+  }
+
+  // 폭죽 효과
+  const canvas = document.getElementById("fireworks");
+  const ctx = canvas.getContext("2d");
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resizeCanvas();
+  window.addEventListener("resize", resizeCanvas);
+
+  let particles = [];
+
+  function createFirework(x, y) {
+    const count = 60;
+    for (let i = 0; i < count; i++) {
+      const angle = (Math.PI * 2 * i) / count;
+      const speed = Math.random() * 4 + 2;
+      particles.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        alpha: 1,
+        color: `hsl(${Math.random() * 360},100%,60%)`
+      });
+    }
+  }
+
+  function updateParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach((p, i) => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.05;
+      p.alpha -= 0.01;
+      ctx.globalAlpha = p.alpha;
+      ctx.fillStyle = p.color;
+      ctx.fillRect(p.x, p.y, 3, 3);
+      if (p.alpha <= 0) particles.splice(i, 1);
+    });
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(updateParticles);
+  }
+
+  updateParticles();
+
+  window.addEventListener("load", () => {
+    let count = 0;
+    const interval = setInterval(() => {
+      for (let i = 0; i < 3; i++) {
+        createFirework(
+            Math.random() * canvas.width,
+            Math.random() * canvas.height * 0.6
+        );
+      }
+      count++;
+      if (count > 15) clearInterval(interval);
+    }, 300);
+  });
+</script>
+</body>
+</html>

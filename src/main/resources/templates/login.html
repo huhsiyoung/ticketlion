@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>티켓사자</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 80px 20px 20px;
+      overflow-y: auto;
+    }
+
+    /* 로그인 컨테이너 */
+    .login-container {
+      position: relative;
+      z-index: 1;
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 450px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* 로고 */
+    .logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .logo-icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    .logo-icon img {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+    }
+
+    .logo-text {
+      font-size: 28px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .logo-subtitle {
+      font-size: 14px;
+      color: #999;
+      margin-top: 5px;
+    }
+
+    /* 탭 메뉴 */
+    .tab-menu {
+      display: flex;
+      margin-bottom: 30px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      background: none;
+      font-size: 16px;
+      color: #999;
+      cursor: pointer;
+      position: relative;
+      transition: color 0.3s;
+    }
+
+    .tab-btn.active {
+      color: #667eea;
+      font-weight: bold;
+    }
+
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #667eea;
+    }
+
+    /* 폼 */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      color: #333;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .form-input:focus {
+      border-color: #667eea;
+    }
+
+    .form-input::placeholder {
+      color: #ccc;
+    }
+
+    /* 체크박스 */
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 25px;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .checkbox-label input {
+      margin-right: 8px;
+      cursor: pointer;
+    }
+
+    .find-link {
+      font-size: 14px;
+      color: #667eea;
+      text-decoration: none;
+      transition: opacity 0.3s;
+    }
+
+    .find-link:hover {
+      opacity: 0.8;
+    }
+
+    /* 버튼 */
+    .btn {
+      width: 100%;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+      margin-bottom: 12px;
+    }
+
+    .btn-primary:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    /* 회원가입 링크 */
+    .signup-link {
+      text-align: center;
+      font-size: 14px;
+      color: #666;
+      margin-top: 25px;
+    }
+
+    .signup-link a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: bold;
+      margin-left: 5px;
+    }
+
+    .signup-link a:hover {
+      text-decoration: underline;
+    }
+
+    /* 회원가입 폼 (숨김) */
+    .signup-form {
+      display: none;
+    }
+
+    .signup-form.active {
+      display: block;
+    }
+
+    .login-form.active {
+      display: block;
+    }
+
+    .login-form {
+      display: none;
+    }
+
+    /* 비밀번호 표시/숨김 */
+    .password-wrapper {
+      position: relative;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      color: #999;
+    }
+
+    .login-error-msg { color:#e53935; font-size:14px; margin:10px 0 0; }
+
+    /* 에러 메시지 */
+    .error-message {
+      display: none;
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #856404;
+    }
+
+    .error-message.show {
+      display: block;
+      animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    /* 모바일 반응형 */
+    @media (max-width: 768px) {
+      .login-container {
+        padding: 30px 20px;
+      }
+
+      .logo-text {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="login-container">
+  <!-- 로고 -->
+  <div class="logo">
+    <div class="logo-icon">
+      <img src="/images/logo.webp" alt="티켓사자 로고" fetchpriority="high">
+    </div>
+    <div class="logo-text">티켓사자</div>
+    <div class="logo-subtitle">최고의 공연을 가장 빠르게</div>
+  </div>
+
+  <!-- 탭 메뉴 -->
+  <div class="tab-menu">
+    <button class="tab-btn active" onclick="switchTab('login')">로그인</button>
+    <button class="tab-btn" onclick="switchTab('signup')">회원가입</button>
+  </div>
+
+  <!-- 에러 메시지 -->
+  <div class="error-message" id="error-message"></div>
+
+  <!-- 로그인 폼 -->
+  <form class="login-form active" id="login-form" th:action="@{/login}" method="post">
+    <div class="form-group">
+      <label class="form-label">이메일</label>
+      <input type="email" class="form-input" name="email"
+             placeholder="example@email.com" required
+             th:value="${email}">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">비밀번호</label>
+      <div class="password-wrapper">
+        <input type="password" class="form-input" id="login-password" name="password"
+               placeholder="비밀번호를 입력하세요" required>
+        <button type="button" class="password-toggle" onclick="togglePassword('login-password', this)">👁️</button>
+      </div>
+    </div>
+
+    <div class="checkbox-group">
+      <label class="checkbox-label">
+        <input type="checkbox" name="remember-me">
+        로그인 상태 유지
+      </label>
+      <a href="#" class="find-link" onclick="findAccount(); return false;">아이디/비밀번호 찾기</a>
+    </div>
+
+    <button type="submit" class="btn btn-primary">로그인</button>
+
+    <p class="login-error-msg"
+       th:if="${errorMessage != null}"
+       th:text="${errorMessage}">
+    </p>
+
+  </form>
+
+  <!-- 회원가입 폼 -->
+  <form class="signup-form" id="signup-form" th:action="@{/signup}" method="post">
+    <div class="form-group">
+      <label class="form-label">이름</label>
+      <input type="text" class="form-input" name="name" placeholder="홍길동" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">이메일</label>
+      <input type="email" class="form-input" name="email" placeholder="example@email.com" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">비밀번호</label>
+      <div class="password-wrapper">
+        <input type="password" class="form-input" id="signup-password" name="password"
+               placeholder="8자 이상 입력하세요" required>
+        <button type="button" class="password-toggle" onclick="togglePassword('signup-password', this)">👁️</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">비밀번호 확인</label>
+      <div class="password-wrapper">
+        <input type="password" class="form-input" id="signup-password-confirm" name="passwordConfirm"
+               placeholder="비밀번호를 다시 입력하세요" required>
+        <button type="button" class="password-toggle" onclick="togglePassword('signup-password-confirm', this)">👁️</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">휴대폰 번호</label>
+      <input type="tel" class="form-input" name="phone" placeholder="010-1234-5678" required>
+    </div>
+
+    <div class="checkbox-group">
+      <label class="checkbox-label">
+        <input type="checkbox" required>
+        이용약관 및 개인정보처리방침 동의 (필수)
+      </label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">회원가입</button>
+  </form>
+
+  <!-- 하단 링크 -->
+  <div class="signup-link" id="bottom-link">
+    아직 회원이 아니신가요?
+    <a href="#" onclick="switchTab('signup'); return false;">회원가입</a>
+  </div>
+</div>
+
+<script>
+  // 탭 전환
+  function switchTab(tab) {
+    const loginForm = document.getElementById('login-form');
+    const signupForm = document.getElementById('signup-form');
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const bottomLink = document.getElementById('bottom-link');
+    const errorMessage = document.getElementById('error-message');
+
+    // 에러 메시지 숨김
+    errorMessage.classList.remove('show');
+
+    if (tab === 'login') {
+      loginForm.classList.add('active');
+      signupForm.classList.remove('active');
+      tabBtns[0].classList.add('active');
+      tabBtns[1].classList.remove('active');
+      bottomLink.innerHTML = '아직 회원이 아니신가요? <a href="#" onclick="switchTab(\'signup\'); return false;">회원가입</a>';
+    } else {
+      signupForm.classList.add('active');
+      loginForm.classList.remove('active');
+      tabBtns[1].classList.add('active');
+      tabBtns[0].classList.remove('active');
+      bottomLink.innerHTML = '이미 회원이신가요? <a href="#" onclick="switchTab(\'login\'); return false;">로그인</a>';
+    }
+  }
+
+  // 비밀번호 표시/숨김
+  function togglePassword(inputId, button) {
+    const input = document.getElementById(inputId);
+    if (input.type === 'password') {
+      input.type = 'text';
+      button.textContent = '🙈';
+    } else {
+      input.type = 'password';
+      button.textContent = '👁️';
+    }
+  }
+
+  // 에러 메시지 표시
+  function showError(message) {
+    const errorMessage = document.getElementById('error-message');
+    errorMessage.textContent = message;
+    errorMessage.classList.add('show');
+
+    setTimeout(() => {
+      errorMessage.classList.remove('show');
+    }, 3000);
+  }
+
+  // 로그인 폼 제출
+  document.getElementById('login-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const email = this.querySelector('input[name="email"]')?.value?.trim();
+    const password = this.querySelector('input[name="password"]')?.value ?? '';
+
+    if (!email || !password) {
+      showError('⚠️ 이메일과 비밀번호를 입력해주세요.');
+      return;
+    }
+
+    HTMLFormElement.prototype.submit.call(this);
+  });
+
+  // 로그인 실패시 비밀번호 지움
+  window.addEventListener('load', () => {
+    const params = new URLSearchParams(location.search);
+    if (params.has('error')) {
+      const pw = document.querySelector('#login-password');
+      if (pw) pw.value = '';
+    }
+  });
+
+  // 회원가입 폼 제출
+  document.getElementById('signup-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const password = document.getElementById('signup-password').value;
+    const passwordConfirm = document.getElementById('signup-password-confirm').value;
+
+    if (!password || password.length < 8) {
+      showError('⚠️ 비밀번호는 8자 이상이어야 합니다.');
+      return;
+    }
+
+    if (password !== passwordConfirm) {
+      showError('⚠️ 비밀번호가 일치하지 않습니다.');
+      return;
+    }
+
+    this.submit();
+  });
+
+  // 계정 찾기
+  function findAccount() {
+    alert('아이디/비밀번호 찾기 페이지로 이동합니다.');
+  }
+</script>
+</body>
+</html>

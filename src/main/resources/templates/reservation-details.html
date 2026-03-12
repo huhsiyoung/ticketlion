@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>티켓사자 - 마이페이지</title>
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    /* ── 배경 장식 ── */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -30%;
+      right: -15%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* ── 전체 컨테이너 ── */
+    .reservation-details-container {
+      position: relative;
+      z-index: 1;
+      max-width: 480px;
+      margin: 40px auto;
+      animation: fadeInUp 0.55s ease-out both;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── 헤더 카드 ── */
+    .profile-card {
+      background: white;
+      border-radius: 24px;
+      padding: 24px 20px 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      text-align: center;
+    }
+
+    .avatar {
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .profile-info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .profile-name {
+      font-size: 18px;
+      font-weight: 900;
+      color: #1a1a2e;
+    }
+
+    .profile-email {
+      font-size: 12px;
+      color: #aaa;
+    }
+
+    .profile-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: linear-gradient(135deg, #667eea22, #764ba222);
+      color: #667eea;
+      border: 1px solid #667eea44;
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .nav-btn {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 10px 6px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      border: none;
+      white-space: nowrap;
+    }
+
+    .nav-btn.primary {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      box-shadow: 0 4px 14px rgba(102,126,234,0.35);
+    }
+
+    .nav-btn.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(102,126,234,0.45);
+    }
+
+    .nav-btn.ghost {
+      background: #f4f4f8;
+      color: #555;
+    }
+
+    .nav-btn.ghost:hover {
+      background: #eceef8;
+      color: #667eea;
+    }
+
+    /* ── 탭 필터 ── */
+    .filter-bar {
+      background: white;
+      border-radius: 16px;
+      padding: 6px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+      display: flex;
+      gap: 4px;
+    }
+
+    .filter-tab {
+      flex: 1;
+      padding: 10px 16px;
+      border-radius: 12px;
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 600;
+      color: #888;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .filter-tab.active {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      box-shadow: 0 4px 12px rgba(102,126,234,0.35);
+    }
+
+    .filter-tab:not(.active):hover {
+      background: #f0f0f8;
+      color: #667eea;
+    }
+
+    /* ── 예매 목록 ── */
+    .reservation-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* ── 예매 카드 ── */
+    .reservation-card {
+      background: white;
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 24px;
+      align-items: center;
+      transition: all 0.25s;
+      animation: fadeInUp 0.4s ease-out both;
+      cursor: default;
+    }
+
+    .reservation-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.16);
+    }
+
+    /* 포스터 */
+    .card-poster {
+      width: 72px;
+      height: 100px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      flex-shrink: 0;
+    }
+
+    /* 정보 */
+    .card-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .card-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: #1a1a2e;
+      margin-bottom: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .meta-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .meta-icon {
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .seats-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .seat-chip {
+      background: #eef0ff;
+      color: #667eea;
+      border: 1px solid #c5caff;
+      border-radius: 8px;
+      padding: 3px 10px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    /* 상태 배지 + 액션 */
+    .card-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .status-badge.confirmed {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border: 1px solid #a5d6a7;
+    }
+
+    .status-badge.pending {
+      background: #fff8e1;
+      color: #f57f17;
+      border: 1px solid #ffe082;
+    }
+
+    .status-badge.cancelled {
+      background: #fce4ec;
+      color: #c62828;
+      border: 1px solid #f48fb1;
+    }
+
+    .reserved-at {
+      font-size: 11px;
+      color: #bbb;
+      text-align: right;
+    }
+
+    .btn-cancel {
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: 1.5px solid #e0e0e0;
+      background: white;
+      color: #999;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .btn-cancel:hover {
+      border-color: #e57373;
+      color: #e57373;
+      background: #fff5f5;
+    }
+
+    /* ── 빈 상태 ── */
+    .empty-state {
+      background: white;
+      border-radius: 20px;
+      padding: 80px 40px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+
+    .empty-icon {
+      font-size: 60px;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .empty-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #1a1a2e;
+      margin-bottom: 8px;
+    }
+
+    .empty-desc {
+      font-size: 14px;
+      color: #aaa;
+      margin-bottom: 28px;
+    }
+
+    /* ── 로딩 ── */
+    .loading-state {
+      background: white;
+      border-radius: 20px;
+      padding: 60px 40px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 4px solid #eef0ff;
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      font-size: 14px;
+      color: #aaa;
+    }
+
+    /* ── 에러 ── */
+    .error-state {
+      background: white;
+      border-radius: 20px;
+      padding: 60px 40px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+
+    .error-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .error-text {
+      font-size: 15px;
+      color: #e57373;
+      margin-bottom: 20px;
+    }
+
+    .btn-retry {
+      padding: 10px 24px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    .btn-retry:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(102,126,234,0.4);
+    }
+
+    /* ── 반응형 ── */
+    @media (max-width: 640px) {
+      .reservation-card {
+        grid-template-columns: auto 1fr;
+        grid-template-rows: auto auto;
+      }
+
+      .card-right {
+        grid-column: 1 / -1;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .card-poster { width: 56px; height: 78px; font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+<div class="reservation-details-container">
+
+  <!-- 프로필 카드 -->
+  <div class="profile-card">
+    <div class="avatar"><img th:src="@{/images/image.webp}" src="/images/image.webp" alt="프로필" style="width:100%;height:100%;object-fit:contain;"></div>
+    <div class="profile-info">
+      <div class="profile-name" th:text="${member.name}">홍길동</div>
+      <div class="profile-email" th:text="${member.email}"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d7b2afb6baa7bbb297b2bab6bebbf9b4b8ba">[email&#160;protected]</a></div>
+      <div class="profile-badge">
+        🎫 일반 회원
+      </div>
+    </div>
+    <div class="nav-links">
+      <a href="/events" class="nav-btn primary">🎟️ 공연 보기</a>
+      <!--                <a href="/logout" class="nav-btn ghost">로그아웃</a>-->
+      <form th:action="@{/logout}" method="post" style="flex:1; margin:0; padding:0; display:contents;">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+        <button type="submit" class="nav-btn ghost" style="width:100%;">로그아웃</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 탭 필터 -->
+  <div class="filter-bar">
+    <button class="filter-tab active" data-status="ALL" onclick="filterReservations('ALL', this)">전체</button>
+    <button class="filter-tab" data-status="CONFIRMED" onclick="filterReservations('CONFIRMED', this)">✅ 예매 완료</button>
+    <button class="filter-tab" data-status="PENDING" onclick="filterReservations('PENDING', this)">⏳ 결제 대기</button>
+    <button class="filter-tab" data-status="CANCELLED" onclick="filterReservations('CANCELLED', this)">❌ 결제 취소</button>
+  </div>
+
+  <!-- 예매 목록 -->
+  <div class="reservation-list" id="reservation-list">
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <div class="loading-text">예매 내역을 불러오는 중...</div>
+    </div>
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script th:inline="javascript">
+  // Thymeleaf에서 회원 ID 주입
+  const MEMBER_ID = /*[[${member.id}]]*/ null;
+
+  // ── 예매 데이터 & 필터 상태 ──
+  let allReservations = [];
+  let currentFilter = 'ALL';
+
+  // ── 날짜 포맷 ──
+  function formatDate(isoStr) {
+    if (!isoStr) return '';
+    const d = new Date(isoStr);
+    return d.toLocaleDateString('ko-KR', {
+      year: 'numeric', month: 'long', day: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+  }
+
+  // ── 상태 배지 ──
+  function statusBadge(status) {
+    const map = {
+      CONFIRMED: { cls: 'confirmed', icon: '✅', label: '예매 완료' },
+      PENDING:   { cls: 'pending',   icon: '⏳', label: '결제 대기' },
+      CANCELLED: { cls: 'cancelled', icon: '❌', label: '결제 취소'   },
+    };
+    const s = map[status] || { cls: 'pending', icon: '❓', label: status };
+    return `<span class="status-badge ${s.cls}">${s.icon} ${s.label}</span>`;
+  }
+
+  // ── 카드 HTML 생성 ──
+  function buildCard(r) {
+    const eventTitle = r.eventTitle || '공연 정보 없음';
+    const eventVenue = r.eventVenue || '-';
+    const seatNo     = r.seatNo     || '-';
+    const reservedAt = r.reservedAt;
+    const status     = r.status;
+    const id         = r.id;
+
+    const cancelBtn = (status === 'PENDING' || status === 'CONFIRMED')
+        ? `<button class="btn-cancel" onclick="cancelReservation(${id})">예매 취소</button>`
+        : '';
+
+    return `
+            <div class="reservation-card" data-status="${status}" data-id="${id}">
+                <div class="card-poster">🎤</div>
+                <div class="card-info">
+                    <div class="card-title">${escapeHtml(eventTitle)}</div>
+                    <div class="card-meta">
+                        <div class="meta-row"><span class="meta-icon">📍</span>${escapeHtml(eventVenue)}</div>
+                    </div>
+                    <div class="seats-row">
+                        <span class="seat-chip">💺 ${escapeHtml(seatNo)}</span>
+                    </div>
+                </div>
+                <div class="card-right">
+                    ${statusBadge(status)}
+                    <div class="reserved-at">예매일 ${formatDate(reservedAt)}</div>
+                    ${cancelBtn}
+                </div>
+            </div>`;
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+  }
+
+  // ── 렌더링 ──
+  function renderList(reservations) {
+    const list = document.getElementById('reservation-list');
+
+    const filtered = currentFilter === 'ALL'
+        ? reservations
+        : reservations.filter(r => r.status === currentFilter);
+
+    if (filtered.length === 0) {
+      const labels = { ALL: '예매 내역이', CONFIRMED: '예매 완료된 내역이', PENDING: '결제 대기 중인 내역이', CANCELLED: '취소된 내역이' };
+      list.innerHTML = `
+                    <div class="empty-state">
+                        <span class="empty-icon"><img src="/images/image.png" alt="" style="width:90px;height:90px;object-fit:contain;"></span>
+                        <div class="empty-title">${labels[currentFilter] || '내역이'} 없어요</div>
+                        <div class="empty-desc">공연을 예매하고 특별한 순간을 만들어보세요!</div>
+                    </div>`;
+      return;
+    }
+
+    list.innerHTML = filtered
+    .sort((a, b) => new Date(b.reservedAt) - new Date(a.reservedAt))
+    .map((r, i) => {
+      const card = buildCard(r);
+      // 카드 애니메이션 딜레이
+      return card.replace('reservation-card"', `reservation-card" style="animation-delay:${i * 0.06}s"`);
+    })
+    .join('');
+  }
+
+  // ── 탭 필터 ──
+  function filterReservations(status, btn) {
+    currentFilter = status;
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    renderList(allReservations);
+  }
+
+  // ── CSRF 토큰 헬퍼 ──
+  function getCsrfHeaders() {
+    const token  = document.querySelector('meta[name="_csrf"]')?.content;
+    const header = document.querySelector('meta[name="_csrf_header"]')?.content;
+    return token && header ? { [header]: token } : {};
+  }
+
+  // ── 예매 취소 ──
+  async function cancelReservation(reservationId) {
+    if (!confirm('정말로 이 예매를 취소하시겠어요?')) return;
+
+    try {
+      const res = await fetch(`/api/reservations/${reservationId}/cancel`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', ...getCsrfHeaders() }
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || '취소 요청에 실패했습니다.');
+      }
+
+      // 로컬 상태 업데이트
+      const target = allReservations.find(r => r.id === reservationId);
+      if (target) target.status = 'CANCELLED';
+      renderList(allReservations);
+
+    } catch (e) {
+      alert('취소 중 오류가 발생했습니다: ' + e.message);
+    }
+  }
+
+  // ── 예매 내역 API 조회 ──
+  async function loadReservations() {
+    const list = document.getElementById('reservation-list');
+    try {
+      const res = await fetch('/api/reservations/my', {
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (!res.ok) throw new Error(`서버 오류 (${res.status})`);
+
+      allReservations = await res.json();
+      renderList(allReservations);
+
+    } catch (e) {
+      list.innerHTML = `
+                    <div class="error-state">
+                        <div class="error-icon">⚠️</div>
+                        <div class="error-text">예매 내역을 불러오지 못했어요.<br>${e.message}</div>
+                        <button class="btn-retry" onclick="loadReservations()">다시 시도</button>
+                    </div>`;
+    }
+  }
+
+  // ── 초기화 ──
+  document.addEventListener('DOMContentLoaded', () => {
+    loadReservations();
+  });
+</script>
+</body>
+</html>

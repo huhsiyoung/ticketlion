@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>티켓사자 - 예매 처리 중</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+
+    .progress-container {
+      margin-bottom: 30px;
+    }
+
+    .checkmark-circle {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 20px;
+      position: relative;
+    }
+
+    .circle-loader {
+      width: 120px;
+      height: 120px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .checkmark {
+      display: none;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: #4caf50;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .checkmark::after {
+      content: '';
+      position: absolute;
+      width: 35px;
+      height: 70px;
+      border: solid white;
+      border-width: 0 8px 8px 0;
+      transform: rotate(45deg);
+      top: 15px;
+      left: 42px;
+    }
+
+    .checkmark.show {
+      display: block;
+      animation: scaleIn 0.5s ease-out;
+    }
+
+    .error-icon {
+      display: none;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: #f44336;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .error-icon::after {
+      content: '✕';
+      position: absolute;
+      color: white;
+      font-size: 60px;
+      font-weight: bold;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .error-icon.show {
+      display: block;
+      animation: scaleIn 0.5s ease-out;
+    }
+
+    @keyframes scaleIn {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    h1 {
+      color: #333;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+
+    .status-message {
+      font-size: 16px;
+      color: #667eea;
+      font-weight: bold;
+      margin-bottom: 30px;
+      min-height: 24px;
+    }
+
+    .status-message.error {
+      color: #f44336;
+    }
+
+    .loading-bar {
+      width: 100%;
+      height: 4px;
+      background: #e0e0e0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 30px;
+    }
+
+    .loading-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      border-radius: 10px;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    .processing-steps {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+      text-align: left;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      margin: 15px 0;
+      padding: 10px;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+
+    .step.active {
+      background: #e8eaf6;
+    }
+
+    .step.completed {
+      background: #e8f5e9;
+    }
+
+    .step.error {
+      background: #fdecea;
+    }
+
+    .step-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+      font-size: 16px;
+      flex-shrink: 0;
+      font-weight: bold;
+    }
+
+    .step.active .step-icon {
+      background: #667eea;
+      color: white;
+      animation: pulse-icon 1.5s infinite;
+    }
+
+    .step.completed .step-icon {
+      background: #4caf50;
+      color: white;
+    }
+
+    .step.pending .step-icon {
+      background: #e0e0e0;
+      color: #999;
+    }
+
+    .step.error .step-icon {
+      background: #f44336;
+      color: white;
+    }
+
+    @keyframes pulse-icon {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .step-text { flex: 1; }
+
+    .step-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 3px;
+    }
+
+    .step-desc {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .order-info {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+      text-align: left;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 10px 0;
+      font-size: 14px;
+    }
+
+    .info-label { color: #666; }
+
+    .info-value {
+      font-weight: bold;
+      color: #333;
+    }
+
+    .warning-box {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .warning-text {
+      color: #856404;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .error-box {
+      display: none;
+      background: #fdecea;
+      border-left: 4px solid #f44336;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .error-box.show { display: block; }
+
+    .error-text {
+      color: #c62828;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .success-message {
+      display: none;
+      background: #e8f5e9;
+      border: 2px solid #4caf50;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .success-message.show {
+      display: block;
+      animation: slideDown 0.5s ease-out;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .success-title {
+      color: #2e7d32;
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .success-text {
+      color: #2e7d32;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: none;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #667eea;
+      border: 2px solid #667eea;
+    }
+
+    .btn:active { transform: scale(0.98); }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 768px) {
+      .container { padding: 20px; }
+      h1 { font-size: 20px; }
+      .checkmark-circle { width: 100px; height: 100px; }
+      .circle-loader { width: 100px; height: 100px; }
+      .checkmark { width: 100px; height: 100px; }
+      .checkmark::after { width: 30px; height: 60px; left: 35px; }
+      .button-group { flex-direction: column; }
+    }
+
+    @media (min-width: 768px) {
+      .container { padding: 40px; }
+      .btn-primary:hover { background: #5568d3; }
+      .btn-secondary:hover { background: #f8f9fa; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="progress-container">
+    <div class="checkmark-circle">
+      <div class="circle-loader" id="loader"></div>
+      <div class="checkmark" id="checkmark"></div>
+      <div class="error-icon" id="error-icon"></div>
+    </div>
+  </div>
+
+  <h1 id="main-title">예매 처리 중</h1>
+  <p class="subtitle" id="subtitle">잠시만 기다려주세요</p>
+
+  <div class="status-message" id="status-message">결제 정보를 확인하고 있습니다...</div>
+
+  <div class="loading-bar">
+    <div class="loading-bar-fill" id="progress-bar"></div>
+  </div>
+
+  <div class="processing-steps" id="steps-container">
+    <div class="step active" id="step-1">
+      <div class="step-icon">1</div>
+      <div class="step-text">
+        <div class="step-title">결제 확인</div>
+        <div class="step-desc">결제 처리 및 예매 정보를 등록합니다</div>
+      </div>
+    </div>
+    <div class="step pending" id="step-2">
+      <div class="step-icon">2</div>
+      <div class="step-text">
+        <div class="step-title">좌석 배정</div>
+        <div class="step-desc">선택하신 좌석을 최종 확정합니다</div>
+      </div>
+    </div>
+    <div class="step pending" id="step-3">
+      <div class="step-icon">3</div>
+      <div class="step-text">
+        <div class="step-title">티켓 발권</div>
+        <div class="step-desc">예매 티켓을 생성합니다</div>
+      </div>
+    </div>
+    <div class="step pending" id="step-4">
+      <div class="step-icon">4</div>
+      <div class="step-text">
+        <div class="step-title">예매 완료</div>
+        <div class="step-desc">모든 처리가 완료됩니다</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="order-info">
+    <div class="info-row">
+      <span class="info-label">공연명</span>
+      <span class="info-value" id="event-title">-</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">선택 좌석</span>
+      <span class="info-value" id="selected-seats">-</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">매수</span>
+      <span class="info-value" id="ticket-count">-</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">결제 금액</span>
+      <span class="info-value" id="total-amount">0원</span>
+    </div>
+  </div>
+
+  <div class="warning-box" id="warning-box">
+    <div class="warning-text">
+      ⚠️ 창을 닫거나 새로고침하지 마세요.<br>
+      예매 처리가 완료될 때까지 기다려주세요.
+    </div>
+  </div>
+
+  <div class="error-box" id="error-box">
+    <div class="error-text" id="error-text">
+      예매 처리 중 오류가 발생했습니다. 다시 시도해주세요.
+    </div>
+  </div>
+
+  <div class="success-message" id="success-message">
+    <div class="success-title">🎉 예매가 완료되었습니다!</div>
+    <div class="success-text">
+      잠시 후 예매 결과 페이지로 이동합니다.
+    </div>
+  </div>
+
+  <div class="button-group" id="button-group" style="display: none;">
+    <button class="btn btn-secondary" onclick="goBack()">돌아가기</button>
+    <button class="btn btn-primary" onclick="goToResult()">결과 확인</button>
+  </div>
+</div>
+
+<script>
+  // fetch 공통 헬퍼
+  function postJson(url, body) {
+    return fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: body ? JSON.stringify(body) : undefined
+    });
+  }
+
+  // reservation.html에서 sessionStorage로 전달받은 데이터
+  const paymentData = JSON.parse(sessionStorage.getItem('paymentData') || 'null');
+
+  // 데이터 없으면 메인으로 리다이렉트
+  if (!paymentData) {
+    alert('잘못된 접근입니다.');
+    window.location.href = '/';
+  }
+
+  // 주문 정보 표시
+  document.getElementById('event-title').textContent = paymentData.eventTitle || '-';
+  document.getElementById('selected-seats').textContent = (paymentData.seatNumbers || []).join(', ');
+  document.getElementById('ticket-count').textContent = (paymentData.seatCount || 0) + '매';
+  document.getElementById('total-amount').textContent = '0원';
+
+  let reservationId = null;  // Step 1 완료 후 채워짐
+  let processingComplete = false;
+
+  // 단계 상태 업데이트 헬퍼
+  function setStepActive(stepNum) {
+    if (stepNum > 1) {
+      const prev = document.getElementById('step-' + (stepNum - 1));
+      prev.classList.remove('active');
+      prev.classList.add('completed');
+      prev.querySelector('.step-icon').textContent = '✓';
+    }
+    const cur = document.getElementById('step-' + stepNum);
+    cur.classList.remove('pending');
+    cur.classList.add('active');
+
+    const progress = (stepNum / 4) * 100;
+    document.getElementById('progress-bar').style.width = progress + '%';
+  }
+
+  function setStepCompleted(stepNum) {
+    const el = document.getElementById('step-' + stepNum);
+    el.classList.remove('active');
+    el.classList.add('completed');
+    el.querySelector('.step-icon').textContent = '✓';
+  }
+
+  function setStepError(stepNum, message) {
+    const el = document.getElementById('step-' + stepNum);
+    el.classList.remove('active', 'pending');
+    el.classList.add('error');
+    el.querySelector('.step-icon').textContent = '✕';
+
+    document.getElementById('loader').style.display = 'none';
+    document.getElementById('error-icon').classList.add('show');
+    document.getElementById('main-title').textContent = '처리 실패';
+    document.getElementById('subtitle').textContent = '예매 중 오류가 발생했습니다';
+
+    const statusMsg = document.getElementById('status-message');
+    statusMsg.textContent = message;
+    statusMsg.classList.add('error');
+
+    document.getElementById('warning-box').style.display = 'none';
+    document.getElementById('error-box').classList.add('show');
+    document.getElementById('error-text').textContent = message;
+    document.getElementById('button-group').style.display = 'flex';
+    document.getElementById('button-group').querySelector('.btn-primary').style.display = 'none';
+  }
+
+  function updateStatus(message) {
+    document.getElementById('status-message').textContent = message;
+  }
+
+  // ── Step 1: 결제 확인 ──────────────────────────────────────────────
+  // POST /reservations/payments → Reservation 생성 + Payment(0원) 처리
+  async function step1_payment() {
+    setStepActive(1);
+    updateStatus('결제 정보를 확인하고 있습니다...');
+
+    await delay(800); // 자연스러운 UX 딜레이
+
+    try {
+      const response = await postJson('/reservations/payments', {
+        eventId: paymentData.eventId,
+        seatNumbers: paymentData.seatNumbers,
+        paymentMethod: paymentData.paymentMethod
+      });
+
+      if (!response.ok) {
+        const err = await response.text();
+        throw new Error(err || '결제 처리 중 오류가 발생했습니다.');
+      }
+
+      const data = await response.json();
+      reservationId = data.reservationId;
+
+      setStepCompleted(1);
+      await delay(400);
+      step2_assignSeats();
+
+    } catch (e) {
+      setStepError(1, e.message || '결제 처리에 실패했습니다.');
+    }
+  }
+
+  // ── Step 2: 좌석 배정 ──────────────────────────────────────────────
+  // POST /reservations/{reservationId}/assign → Redis 홀드 삭제
+  async function step2_assignSeats() {
+    setStepActive(2);
+    updateStatus('선택하신 좌석을 최종 배정하고 있습니다...');
+
+    await delay(800);
+
+    try {
+      const response = await postJson('/reservations/' + reservationId + '/assign');
+
+      if (!response.ok) {
+        const err = await response.text();
+        throw new Error(err || '좌석 배정 중 오류가 발생했습니다.');
+      }
+
+      setStepCompleted(2);
+      await delay(400);
+      step3_issueTicket();
+
+    } catch (e) {
+      setStepError(2, e.message || '좌석 배정에 실패했습니다.');
+    }
+  }
+
+  // ── Step 3: 티켓 발권 ──────────────────────────────────────────────
+  // 별도 API 없이 프론트 딜레이 (티켓 데이터는 이미 DB에 있음)
+  async function step3_issueTicket() {
+    setStepActive(3);
+    updateStatus('티켓을 발권하고 있습니다...');
+
+    await delay(1200); // 발권 처리 느낌
+
+    setStepCompleted(3);
+    await delay(400);
+    step4_complete();
+  }
+
+  // ── Step 4: 예매 완료 ──────────────────────────────────────────────
+  async function step4_complete() {
+    setStepActive(4);
+    updateStatus('예매를 최종 완료하고 있습니다...');
+
+    await delay(800);
+
+    setStepCompleted(4);
+    document.getElementById('progress-bar').style.width = '100%';
+
+    // 완료 UI
+    document.getElementById('loader').style.display = 'none';
+    document.getElementById('checkmark').classList.add('show');
+    document.getElementById('main-title').textContent = '예매 완료!';
+    document.getElementById('subtitle').textContent = '티켓이 발급되었습니다';
+    document.getElementById('status-message').textContent = '';
+    document.getElementById('warning-box').style.display = 'none';
+
+    document.getElementById('success-message').classList.add('show');
+    document.getElementById('button-group').style.display = 'flex';
+
+    processingComplete = true;
+    sessionStorage.removeItem('paymentData'); // 사용한 데이터 정리
+
+    // 체크마크 애니메이션(0.5s)이 끝나면 바로 결과 페이지로 이동
+    document.getElementById('checkmark').addEventListener('animationend', () => {
+      goToResult();
+    }, { once: true });
+  }
+
+  // 결과 페이지 이동
+  function goToResult() {
+    if (reservationId) {
+      window.location.href = '/reservations/' + reservationId + '/results';
+    }
+  }
+
+  // 뒤로 가기 (에러 시)
+  function goBack() {
+    history.back();
+  }
+
+  // 딜레이 헬퍼
+  function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  // 페이지 이탈 방지
+  window.addEventListener('beforeunload', (e) => {
+    if (!processingComplete) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  });
+
+  // 처리 시작
+  setTimeout(() => {
+    step1_payment();
+  }, 500);
+</script>
+</body>
+</html>
