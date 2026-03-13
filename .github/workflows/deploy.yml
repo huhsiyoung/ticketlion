@@ -75,7 +75,7 @@ jobs:
             echo ">>> 새 애플리케이션 시작"
             setsid nohup java -jar $JAR_FILE \
               --spring.profiles.active=prod \
-              --spring.config.additional-location=file:$APP_DIR/config/ \
+              --spring.config.additional-location=file:/root/ \
               < /dev/null >> $APP_DIR/app.log 2>&1 &
 
             NEW_PID=$!
