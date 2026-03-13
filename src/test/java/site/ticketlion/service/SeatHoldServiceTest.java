@@ -94,8 +94,8 @@ class SeatHoldServiceTest {
         when(redisTemplate.execute(
             any(DefaultRedisScript.class),
             anyList(),
-            any(),
-            any()
+            anyString(),
+            anyString()
         )).thenReturn(1L);
 
         // when
