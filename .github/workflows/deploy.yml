@@ -58,7 +58,7 @@ jobs:
           port: 22
           script: |
             APP_DIR="/home/${{ secrets.SERVER_USER }}/app"
-            JAR_FILE=$(ls $APP_DIR/build/libs/*.jar | grep -v plain)
+            JAR_FILE=$(ls $APP_DIR/*.jar | grep -v plain)
             PID_FILE="$APP_DIR/app.pid"
 
             echo ">>> 기존 프로세스 종료"
@@ -73,7 +73,10 @@ jobs:
             fi
 
             echo ">>> 새 애플리케이션 시작"
-            setsid nohup java -jar $JAR_FILE --spring.profiles.active=prod < /dev/null >> $APP_DIR/app.log 2>&1 &
+            setsid nohup java -jar $JAR_FILE \
+              --spring.profiles.active=prod \
+              --spring.config.additional-location=file:/root/ \
+              < /dev/null >> $APP_DIR/app.log 2>&1 &
 
             NEW_PID=$!
             echo $NEW_PID > "$PID_FILE"

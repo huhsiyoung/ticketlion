@@ -1,5 +1,6 @@
 package site.ticketlion.repository;
 
+import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +76,7 @@ class ReservationRepositoryTest {
     void findBatchReservations() {
         // given
         UUID userId = UUID.randomUUID();
-        Instant reservedAt = Instant.now();
+        Instant reservedAt = Instant.now().truncatedTo(ChronoUnit.MILLIS);
         Event event = new Event(null, "Test Event", LocalDateTime.now(), "CONCERT", "Venue", 10000, null, null, EventStatus.ACTIVE, "#FFFFFF", "😀");
         eventRepository.save(event);
         Seat seat1 = new Seat(event, "A1", SeatStatus.RESERVED);
