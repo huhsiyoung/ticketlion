@@ -32,26 +32,26 @@ class MemberUserDetailsServiceTest {
     @DisplayName("사용자 정보 로드 성공")
     void loadUserByUsername_success() {
         // given
-        String email = "test@test.com";
-        Member member = new Member("test", email, "password", "01012345678", MemberRole.USER);
-        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
+        String username = "testuser";
+        Member member = new Member("test", username, "password", MemberRole.USER);
+        when(memberRepository.findByUsername(username)).thenReturn(Optional.of(member));
 
         // when
-        UserDetails userDetails = memberUserDetailsService.loadUserByUsername(email);
+        UserDetails userDetails = memberUserDetailsService.loadUserByUsername(username);
 
         // then
         assertNotNull(userDetails);
-        assertEquals(email, userDetails.getUsername());
+        assertEquals(username, userDetails.getUsername());
     }
 
     @Test
     @DisplayName("사용자 정보 로드 실패 - 존재하지 않는 회원")
     void loadUserByUsername_fail_not_found() {
         // given
-        String email = "test@test.com";
-        when(memberRepository.findByEmail(email)).thenReturn(Optional.empty());
+        String username = "testuser";
+        when(memberRepository.findByUsername(username)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(UsernameNotFoundException.class, () -> memberUserDetailsService.loadUserByUsername(email));
+        assertThrows(UsernameNotFoundException.class, () -> memberUserDetailsService.loadUserByUsername(username));
     }
 }

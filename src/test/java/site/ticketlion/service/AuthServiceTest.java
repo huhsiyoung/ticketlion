@@ -28,13 +28,12 @@ class AuthServiceTest {
     @InjectMocks
     private AuthService authService;
 
-    private SignupRequest createSignupRequest(String name, String email, String password, String passwordConfirm, String phone) {
+    private SignupRequest createSignupRequest(String name, String username, String password, String passwordConfirm) {
         SignupRequest request = new SignupRequest();
         request.setName(name);
-        request.setEmail(email);
+        request.setUsername(username);
         request.setPassword(password);
         request.setPasswordConfirm(passwordConfirm);
-        request.setPhone(phone);
         return request;
     }
 
@@ -42,8 +41,8 @@ class AuthServiceTest {
     @DisplayName("회원가입 성공")
     void signup_success() {
         // given
-        SignupRequest request = createSignupRequest("test", "test@test.com", "password123", "password123", "01012345678");
-        when(memberRepository.existsByEmail(request.getEmail())).thenReturn(false);
+        SignupRequest request = createSignupRequest("test", "testuser", "password123", "password123");
+        when(memberRepository.existsByUsername(request.getUsername())).thenReturn(false);
         when(passwordEncoder.encode(request.getPassword())).thenReturn("encodedPassword");
 
         // when
@@ -54,11 +53,11 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("회원가입 실패 - 중복된 이메일")
-    void signup_fail_duplicate_email() {
+    @DisplayName("회원가입 실패 - 중복된 아이디")
+    void signup_fail_duplicate_username() {
         // given
-        SignupRequest request = createSignupRequest("test", "test@test.com", "password123", "password123", "01012345678");
-        when(memberRepository.existsByEmail(request.getEmail())).thenReturn(true);
+        SignupRequest request = createSignupRequest("test", "testuser", "password123", "password123");
+        when(memberRepository.existsByUsername(request.getUsername())).thenReturn(true);
 
         // when & then
         assertThrows(IllegalArgumentException.class, () -> authService.signup(request));
@@ -68,8 +67,8 @@ class AuthServiceTest {
     @DisplayName("회원가입 실패 - 비밀번호 불일치")
     void signup_fail_password_mismatch() {
         // given
-        SignupRequest request = createSignupRequest("test", "test@test.com", "password123", "wrongpassword", "01012345678");
-        when(memberRepository.existsByEmail(request.getEmail())).thenReturn(false);
+        SignupRequest request = createSignupRequest("test", "testuser", "password123", "wrongpassword");
+        when(memberRepository.existsByUsername(request.getUsername())).thenReturn(false);
 
         // when & then
         assertThrows(IllegalArgumentException.class, () -> authService.signup(request));

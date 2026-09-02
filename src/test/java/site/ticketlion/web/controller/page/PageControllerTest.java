@@ -64,7 +64,7 @@ class PageControllerTest {
     @BeforeEach
     void setUp() {
         memberId = UUID.randomUUID();
-        Member member = new Member(memberId, "테스트유저", "test@example.com", "hashed", "010-0000-0000",
+        Member member = new Member(memberId, "테스트유저", "testuser", "hashed",
             MemberRole.USER, null, null);
         userDetails = new MemberUserDetails(member);
         auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
@@ -228,8 +228,8 @@ class PageControllerTest {
     @Test
     @DisplayName("예매 상세 페이지 - 회원 정보 모델에 포함")
     void getReservationDetails_returnsViewWithMember() throws Exception {
-        MemberResponse memberResponse = new MemberResponse(memberId, "테스트유저", "test@example.com",
-            "010-0000-0000", MemberRole.USER, null);
+        MemberResponse memberResponse = new MemberResponse(memberId, "테스트유저", "testuser",
+            MemberRole.USER, null);
         when(memberService.getMember(memberId)).thenReturn(memberResponse);
 
         mockMvc.perform(get("/reservation-details").with(authentication(auth)))

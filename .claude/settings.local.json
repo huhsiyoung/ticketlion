@@ -1,7 +1,18 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(xargs -I{} sh -c 'echo ==={}===; cat {}')",
+      "Bash(./gradlew compileJava compileTestJava)",
+      "Bash(./gradlew test *)"
+    ]
+  },
   "model": "claude-sonnet-4-6",
   "language": "english",
   "permissionMode": "default",
-  "allowedTools": ["Read", "Edit", "Bash"],
+  "allowedTools": [
+    "Read",
+    "Edit",
+    "Bash"
+  ],
   "appendSystemPrompt": "You are a careful coding assistant. Always explain changes briefly before applying them."
 }
