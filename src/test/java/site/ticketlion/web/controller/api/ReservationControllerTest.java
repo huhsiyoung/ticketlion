@@ -69,8 +69,8 @@ class ReservationControllerTest {
     @BeforeEach
     void setUp() {
         memberId = UUID.randomUUID();
-        Member member = new Member(memberId, "Test User", "test@example.com", "password",
-                "01012345678", MemberRole.USER, LocalDateTime.now(), LocalDateTime.now());
+        Member member = new Member(memberId, "Test User", "testuser", "password",
+                MemberRole.USER, LocalDateTime.now(), LocalDateTime.now());
         userDetails = new MemberUserDetails(member);
         auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }

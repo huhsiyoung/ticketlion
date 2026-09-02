@@ -18,51 +18,51 @@ class MemberRepositoryTest {
     private MemberRepository memberRepository;
 
     @Test
-    @DisplayName("이메일로 회원 찾기")
-    void findByEmail() {
+    @DisplayName("아이디로 회원 찾기")
+    void findByUsername() {
         // given
-        String email = "test@test.com";
-        Member member = new Member("test", email, "password", "01012345678", MemberRole.USER);
+        String username = "testuser";
+        Member member = new Member("test", username, "password", MemberRole.USER);
         memberRepository.save(member);
 
         // when
-        Optional<Member> foundMember = memberRepository.findByEmail(email);
+        Optional<Member> foundMember = memberRepository.findByUsername(username);
 
         // then
         assertTrue(foundMember.isPresent());
-        assertEquals(email, foundMember.get().getEmail());
+        assertEquals(username, foundMember.get().getUsername());
     }
 
     @Test
-    @DisplayName("이메일 존재 여부 확인")
-    void existsByEmail() {
+    @DisplayName("아이디 존재 여부 확인")
+    void existsByUsername() {
         // given
-        String email = "test@test.com";
-        Member member = new Member("test", email, "password", "01012345678", MemberRole.USER);
+        String username = "testuser";
+        Member member = new Member("test", username, "password", MemberRole.USER);
         memberRepository.save(member);
 
         // when
-        boolean exists = memberRepository.existsByEmail(email);
+        boolean exists = memberRepository.existsByUsername(username);
 
         // then
         assertTrue(exists);
     }
 
     @Test
-    @DisplayName("존재하지 않는 이메일로 회원 찾기")
-    void findByEmail_not_found() {
+    @DisplayName("존재하지 않는 아이디로 회원 찾기")
+    void findByUsername_not_found() {
         // when
-        Optional<Member> foundMember = memberRepository.findByEmail("nonexistent@test.com");
+        Optional<Member> foundMember = memberRepository.findByUsername("nonexistent");
 
         // then
         assertFalse(foundMember.isPresent());
     }
 
     @Test
-    @DisplayName("존재하지 않는 이메일 존재 여부 확인")
-    void existsByEmail_not_found() {
+    @DisplayName("존재하지 않는 아이디 존재 여부 확인")
+    void existsByUsername_not_found() {
         // when
-        boolean exists = memberRepository.existsByEmail("nonexistent@test.com");
+        boolean exists = memberRepository.existsByUsername("nonexistent");
 
         // then
         assertFalse(exists);

@@ -33,7 +33,7 @@ class MemberServiceTest {
     void getMember_success() {
         // given
         UUID memberId = UUID.randomUUID();
-        Member member = new Member("Test User", "test@test.com", "password", "01012345678", MemberRole.USER);
+        Member member = new Member("Test User", "testuser", "password", MemberRole.USER);
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
 
         // when
@@ -42,7 +42,7 @@ class MemberServiceTest {
         // then
         assertNotNull(response);
         assertEquals(member.getName(), response.name());
-        assertEquals(member.getEmail(), response.email());
+        assertEquals(member.getUsername(), response.username());
     }
 
     @Test
