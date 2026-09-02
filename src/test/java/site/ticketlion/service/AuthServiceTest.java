@@ -28,9 +28,9 @@ class AuthServiceTest {
     @InjectMocks
     private AuthService authService;
 
-    private SignupRequest createSignupRequest(String name, String username, String password, String passwordConfirm) {
+    private SignupRequest createSignupRequest(String displayName, String username, String password, String passwordConfirm) {
         SignupRequest request = new SignupRequest();
-        request.setName(name);
+        request.setDisplayName(displayName);
         request.setUsername(username);
         request.setPassword(password);
         request.setPasswordConfirm(passwordConfirm);
