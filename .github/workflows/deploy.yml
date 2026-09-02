@@ -3,6 +3,7 @@ name: Spring Boot CI/CD
 on:
   push:
     branches: [ "main" ]
+  workflow_dispatch:  # 수동 트리거 허용
 
 jobs:
   build-and-deploy:
