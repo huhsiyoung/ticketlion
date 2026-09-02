@@ -7,7 +7,7 @@ import site.ticketlion.domain.MemberRole;
 
 public record MemberResponse(
     UUID id,
-    String name,
+    String displayName,
     String username,
     MemberRole role,
     LocalDateTime createdAt
@@ -15,7 +15,7 @@ public record MemberResponse(
     public static MemberResponse from(Member m) {
         return new MemberResponse(
             m.getId(),
-            m.getName(),
+            m.getDisplayName(),
             m.getUsername(),
             m.getRole(),
             m.getCreatedAt()
