@@ -30,8 +30,8 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false, length = 80)
-    private String name;
+    @Column(name = "display_name", nullable = false, length = 80)
+    private String displayName;
 
     @Column(nullable = false, length = 50, unique = true)
     private String username;
@@ -61,8 +61,8 @@ public class Member {
         updatedAt = LocalDateTime.now();
     }
 
-    public Member(String name, String username, String passwordHash, MemberRole role) {
-        this.name = name;
+    public Member(String displayName, String username, String passwordHash, MemberRole role) {
+        this.displayName = displayName;
         this.username = username;
         this.passwordHash = passwordHash;
         this.role = role;

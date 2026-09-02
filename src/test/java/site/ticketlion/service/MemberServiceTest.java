@@ -41,7 +41,7 @@ class MemberServiceTest {
 
         // then
         assertNotNull(response);
-        assertEquals(member.getName(), response.name());
+        assertEquals(member.getDisplayName(), response.displayName());
         assertEquals(member.getUsername(), response.username());
     }
 

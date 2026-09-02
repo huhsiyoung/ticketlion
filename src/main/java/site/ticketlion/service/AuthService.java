@@ -30,7 +30,7 @@ public class AuthService {
         }
 
         Member member = new Member(
-            req.getName(),
+            req.getDisplayName(),
             req.getUsername(),
             passwordEncoder.encode(req.getPassword()),
             MemberRole.USER
