@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "members", indexes = {
-    @Index(name = "idx_members_email", columnList = "email", unique = true)
+    @Index(name = "idx_members_username", columnList = "username", unique = true)
 })
 public class Member {
 
@@ -30,17 +30,14 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false, length = 80)
-    private String name;
+    @Column(name = "display_name", nullable = false, length = 80)
+    private String displayName;
 
-    @Column(nullable = false, length = 120, unique = true)
-    private String email;
+    @Column(nullable = false, length = 50, unique = true)
+    private String username;
 
     @Column(nullable = false, length = 100)
     private String passwordHash;
-
-    @Column(nullable = false, length = 20)
-    private String phone;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -64,11 +61,10 @@ public class Member {
         updatedAt = LocalDateTime.now();
     }
 
-    public Member(String name, String email, String passwordHash, String phone, MemberRole role) {
-        this.name = name;
-        this.email = email;
+    public Member(String displayName, String username, String passwordHash, MemberRole role) {
+        this.displayName = displayName;
+        this.username = username;
         this.passwordHash = passwordHash;
-        this.phone = phone;
         this.role = role;
     }
 }

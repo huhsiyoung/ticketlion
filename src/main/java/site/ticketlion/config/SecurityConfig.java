@@ -50,13 +50,13 @@ public class SecurityConfig {
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login")
-                .usernameParameter("email")
+                .usernameParameter("username")
                 .passwordParameter("password")
                 .defaultSuccessUrl("/events", true)
                 .failureHandler((request, response, exception) -> {
                     HttpSession session = request.getSession();
-                    session.setAttribute("LOGIN_ERROR", "⚠️ 이메일 또는 비밀번호가 올바르지 않습니다.");
-                    session.setAttribute("LOGIN_EMAIL", request.getParameter("email"));
+                    session.setAttribute("LOGIN_ERROR", "⚠️ 아이디 또는 비밀번호가 올바르지 않습니다.");
+                    session.setAttribute("LOGIN_USERNAME", request.getParameter("username"));
                     response.sendRedirect("/login");
                 })
             )

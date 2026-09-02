@@ -313,10 +313,10 @@
   <!-- 로그인 폼 -->
   <form class="login-form active" id="login-form" th:action="@{/login}" method="post">
     <div class="form-group">
-      <label class="form-label">이메일</label>
-      <input type="email" class="form-input" name="email"
-             placeholder="example@email.com" required
-             th:value="${email}">
+      <label class="form-label">아이디</label>
+      <input type="text" class="form-input" name="username"
+             placeholder="아이디를 입력하세요" required
+             th:value="${username}">
     </div>
 
     <div class="form-group">
@@ -349,12 +349,12 @@
   <form class="signup-form" id="signup-form" th:action="@{/signup}" method="post">
     <div class="form-group">
       <label class="form-label">이름</label>
-      <input type="text" class="form-input" name="name" placeholder="홍길동" required>
+      <input type="text" class="form-input" name="displayName" placeholder="홍길동" required>
     </div>
 
     <div class="form-group">
-      <label class="form-label">이메일</label>
-      <input type="email" class="form-input" name="email" placeholder="example@email.com" required>
+      <label class="form-label">아이디</label>
+      <input type="text" class="form-input" name="username" placeholder="아이디를 입력하세요" required>
     </div>
 
     <div class="form-group">
@@ -373,11 +373,6 @@
                placeholder="비밀번호를 다시 입력하세요" required>
         <button type="button" class="password-toggle" onclick="togglePassword('signup-password-confirm', this)">👁️</button>
       </div>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">휴대폰 번호</label>
-      <input type="tel" class="form-input" name="phone" placeholder="010-1234-5678" required>
     </div>
 
     <div class="checkbox-group">
@@ -451,11 +446,11 @@
   document.getElementById('login-form').addEventListener('submit', function (e) {
     e.preventDefault();
 
-    const email = this.querySelector('input[name="email"]')?.value?.trim();
+    const username = this.querySelector('input[name="username"]')?.value?.trim();
     const password = this.querySelector('input[name="password"]')?.value ?? '';
 
-    if (!email || !password) {
-      showError('⚠️ 이메일과 비밀번호를 입력해주세요.');
+    if (!username || !password) {
+      showError('⚠️ 아이디와 비밀번호를 입력해주세요.');
       return;
     }
 

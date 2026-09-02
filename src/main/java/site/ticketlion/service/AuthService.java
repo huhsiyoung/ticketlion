@@ -19,8 +19,8 @@ public class AuthService {
 
     @Transactional
     public void signup(SignupRequest req) {
-        if (memberRepository.existsByEmail(req.getEmail())) {
-            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+        if (memberRepository.existsByUsername(req.getUsername())) {
+            throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
         }
         if (req.getPassword() == null || req.getPassword().length() < 8) {
             throw new IllegalArgumentException("비밀번호는 8자 이상이어야 합니다.");
@@ -30,10 +30,9 @@ public class AuthService {
         }
 
         Member member = new Member(
-            req.getName(),
-            req.getEmail(),
+            req.getDisplayName(),
+            req.getUsername(),
             passwordEncoder.encode(req.getPassword()),
-            req.getPhone(),
             MemberRole.USER
         );
 

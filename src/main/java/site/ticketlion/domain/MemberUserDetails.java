@@ -23,7 +23,7 @@ public class MemberUserDetails implements UserDetails {
     }
 
     @Override public String getPassword() { return member.getPasswordHash(); }
-    @Override public String getUsername() { return member.getEmail(); }
+    @Override public String getUsername() { return member.getUsername(); }
     @Override public boolean isAccountNonExpired() { return true; }
     @Override public boolean isAccountNonLocked() { return true; }
     @Override public boolean isCredentialsNonExpired() { return true; }

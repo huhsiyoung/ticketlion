@@ -24,13 +24,13 @@ public class AuthController {
 
         if (session != null) {
             Object msg = session.getAttribute("LOGIN_ERROR");
-            Object email = session.getAttribute("LOGIN_EMAIL");
+            Object username = session.getAttribute("LOGIN_USERNAME");
 
             if (msg != null) model.addAttribute("errorMessage", msg.toString());
-            if (email != null) model.addAttribute("email", email.toString());
+            if (username != null) model.addAttribute("username", username.toString());
 
             session.removeAttribute("LOGIN_ERROR");
-            session.removeAttribute("LOGIN_EMAIL");
+            session.removeAttribute("LOGIN_USERNAME");
         }
 
         model.addAttribute("signupRequest", new SignupRequest());

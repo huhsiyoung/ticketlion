@@ -15,16 +15,15 @@ create table if not exists events (
 create table if not exists members (
                                        id uuid primary key,
                                        name varchar(80) not null,
-    email varchar(120) not null,
+    username varchar(50) not null,
     password_hash varchar(100) not null,
-    phone varchar(20) not null,
     role varchar(20) not null check (role in ('ADMIN', 'USER')),
     created_at timestamp not null,
     updated_at timestamp not null
     );
 
-create unique index if not exists idx_members_email
-    on members(email);
+create unique index if not exists idx_members_username
+    on members(username);
 
 create table if not exists seats (
                                      id bigserial primary key,
