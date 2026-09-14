@@ -57,6 +57,9 @@ public class Event {
     @Column(nullable = false)
     private String thumbnailEmoji;
 
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
     @PrePersist
     void prePersist() {
         LocalDateTime now = LocalDateTime.now();
@@ -77,7 +80,7 @@ public class Event {
     }
 
     public void update(String title, LocalDateTime startAt, String category, String venue,
-        Integer price, String themeColor, String thumbnailEmoji) {
+        Integer price, String themeColor, String thumbnailEmoji, String description) {
         this.title = title;
         this.startAt = startAt;
         this.category = category;
@@ -85,5 +88,6 @@ public class Event {
         this.price = price;
         this.themeColor = themeColor;
         this.thumbnailEmoji = thumbnailEmoji;
+        this.description = description;
     }
 }

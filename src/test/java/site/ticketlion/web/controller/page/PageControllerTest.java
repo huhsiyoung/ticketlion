@@ -72,7 +72,7 @@ class PageControllerTest {
 
     private Event sampleEvent() {
         return new Event(1L, "공연A", LocalDateTime.now(), "콘서트", "서울", 50000,
-            null, null, EventStatus.ACTIVE, "#FF0000", "🎵");
+            null, null, EventStatus.ACTIVE, "#FF0000", "🎵", null);
     }
 
     // ---------------------------------------------------------------

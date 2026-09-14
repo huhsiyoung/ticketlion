@@ -28,7 +28,7 @@ class SeatRepositoryTest {
     @DisplayName("이벤트 ID로 모든 좌석 삭제")
     void deleteByEventId() {
         // given
-        Event event = new Event(null, "Test Event", LocalDateTime.now(), "CONCERT", "Venue", 10000, null, null, EventStatus.ACTIVE, "#FFFFFF", "😀");
+        Event event = new Event(null, "Test Event", LocalDateTime.now(), "CONCERT", "Venue", 10000, null, null, EventStatus.ACTIVE, "#FFFFFF", "😀", null);
         eventRepository.save(event);
         Seat seat1 = new Seat(event, "A1", SeatStatus.AVAILABLE);
         Seat seat2 = new Seat(event, "A2", SeatStatus.AVAILABLE);
@@ -46,7 +46,7 @@ class SeatRepositoryTest {
     @DisplayName("이벤트 ID로 모든 좌석 조회")
     void findAllByEventId() {
         // given
-        Event event = new Event(null, "Test Event", LocalDateTime.now(), "CONCERT", "Venue", 10000, null, null, EventStatus.ACTIVE, "#FFFFFF", "😀");
+        Event event = new Event(null, "Test Event", LocalDateTime.now(), "CONCERT", "Venue", 10000, null, null, EventStatus.ACTIVE, "#FFFFFF", "😀", null);
         eventRepository.save(event);
         Seat seat1 = new Seat(event, "A1", SeatStatus.AVAILABLE);
         Seat seat2 = new Seat(event, "A2", SeatStatus.AVAILABLE);
@@ -63,7 +63,7 @@ class SeatRepositoryTest {
     @DisplayName("이벤트 ID와 좌석 번호로 좌석 조회")
     void findByEventIdAndSeatNo() {
         // given
-        Event event = new Event(null, "Test Event", LocalDateTime.now(), "CONCERT", "Venue", 10000, null, null, EventStatus.ACTIVE, "#FFFFFF", "😀");
+        Event event = new Event(null, "Test Event", LocalDateTime.now(), "CONCERT", "Venue", 10000, null, null, EventStatus.ACTIVE, "#FFFFFF", "😀", null);
         eventRepository.save(event);
         Seat seat = new Seat(event, "A1", SeatStatus.AVAILABLE);
         seatRepository.save(seat);
@@ -80,7 +80,7 @@ class SeatRepositoryTest {
     @DisplayName("이벤트 ID와 좌석 번호 리스트로 좌석 조회")
     void findByEventIdAndSeatNoIn() {
         // given
-        Event event = new Event(null, "Test Event", LocalDateTime.now(), "CONCERT", "Venue", 10000, null, null, EventStatus.ACTIVE, "#FFFFFF", "😀");
+        Event event = new Event(null, "Test Event", LocalDateTime.now(), "CONCERT", "Venue", 10000, null, null, EventStatus.ACTIVE, "#FFFFFF", "😀", null);
         eventRepository.save(event);
         Seat seat1 = new Seat(event, "A1", SeatStatus.AVAILABLE);
         Seat seat2 = new Seat(event, "A2", SeatStatus.AVAILABLE);
@@ -97,7 +97,7 @@ class SeatRepositoryTest {
     @DisplayName("좌석 번호 리스트 중 이미 예약된 좌석 개수 조회")
     void countReserved() {
         // given
-        Event event = new Event(null, "Test Event", LocalDateTime.now(), "CONCERT", "Venue", 10000, null, null, EventStatus.ACTIVE, "#FFFFFF", "😀");
+        Event event = new Event(null, "Test Event", LocalDateTime.now(), "CONCERT", "Venue", 10000, null, null, EventStatus.ACTIVE, "#FFFFFF", "😀", null);
         eventRepository.save(event);
         Seat seat1 = new Seat(event, "A1", SeatStatus.RESERVED);
         Seat seat2 = new Seat(event, "A2", SeatStatus.AVAILABLE);
