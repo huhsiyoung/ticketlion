@@ -87,29 +87,49 @@ create index if not exists idx_payment_user
 INSERT INTO events
 (title, start_at, category, venue, price, theme_color, thumbnail_emoji, created_at, updated_at, status)
 VALUES
-    ('BTS 월드투어 인 서울', TIMESTAMP '2025-04-15 19:00:00', 'K-POP', '잠실 올림픽 주경기장', 110000, 'g1', '🎤', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
+    ('BTS 월드투어 인 서울', TIMESTAMP '2027-04-15 19:00:00', 'K-POP', '잠실 올림픽 주경기장', 110000, 'g1', '🎤', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
 
-    ('아이유 이벤트 <The Winning>', TIMESTAMP '2025-03-22 18:00:00', 'K-POP', 'KSPO DOME', 132000, 'g2', '🎵', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
+    ('아이유 이벤트 <The Winning>', TIMESTAMP '2027-03-22 18:00:00', 'K-POP', 'KSPO DOME', 132000, 'g2', '🎵', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
 
-    ('Ed Sheeran Asia Tour 2025', TIMESTAMP '2025-05-10 19:30:00', 'POP', '고척 스카이돔', 154000, 'g3', '🎸', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
+    ('Ed Sheeran Asia Tour 2025', TIMESTAMP '2027-05-10 19:30:00', 'POP', '고척 스카이돔', 154000, 'g3', '🎸', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
 
-    ('임영웅 전국투어 <IM HERO>', TIMESTAMP '2025-06-14 19:00:00', 'K-POP', '올림픽공원 체조경기장', 143000, 'g4', '🎤', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
+    ('임영웅 전국투어 <IM HERO>', TIMESTAMP '2027-06-14 19:00:00', 'K-POP', '올림픽공원 체조경기장', 143000, 'g4', '🎤', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
 
-    ('Coldplay Music of the Spheres', TIMESTAMP '2025-04-28 20:00:00', 'POP', '인천 아시아드 주경기장', 165000, 'g5', '🌟', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
+    ('Coldplay Music of the Spheres', TIMESTAMP '2027-04-28 20:00:00', 'POP', '인천 아시아드 주경기장', 165000, 'g5', '🌟', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
 
-    ('2025 봄 재즈 페스티벌', TIMESTAMP '2025-05-01 17:00:00', '재즈', '올림픽공원 88잔디마당', 99000, 'g6', '🎺', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
+    ('2025 봄 재즈 페스티벌', TIMESTAMP '2027-05-01 17:00:00', '재즈', '올림픽공원 88잔디마당', 99000, 'g6', '🎺', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
 
-    ('세븐틴 <FOLLOW AGAIN> 투어', TIMESTAMP '2025-03-29 18:00:00', 'K-POP', '서울 월드컵경기장', 121000, 'g7', '💎', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
+    ('세븐틴 <FOLLOW AGAIN> 투어', TIMESTAMP '2027-03-29 18:00:00', 'K-POP', '서울 월드컵경기장', 121000, 'g7', '💎', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
 
-    ('Bruno Mars 24K Magic Tour', TIMESTAMP '2025-07-05 19:00:00', 'POP', 'KSPO DOME', 176000, 'g8', '🕺', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
+    ('Bruno Mars 24K Magic Tour', TIMESTAMP '2027-07-05 19:00:00', 'POP', 'KSPO DOME', 176000, 'g8', '🕺', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
 
-    ('뉴진스 팬미팅 <Bunnies>', TIMESTAMP '2025-04-05 18:00:00', 'K-POP', '올림픽공원 체조경기장', 110000, 'g9', '🐰', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
+    ('뉴진스 팬미팅 <Bunnies>', TIMESTAMP '2027-04-05 18:00:00', 'K-POP', '올림픽공원 체조경기장', 110000, 'g9', '🐰', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
 
-    ('John Mayer Asia Tour', TIMESTAMP '2025-05-20 20:00:00', 'POP', '블루스퀘어 마스터카드홀', 143000, 'g10', '🎸', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
+    ('John Mayer Asia Tour', TIMESTAMP '2027-05-20 20:00:00', 'POP', '블루스퀘어 마스터카드홀', 143000, 'g10', '🎸', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
 
-    ('에픽하이 2025 이벤트', TIMESTAMP '2025-03-15 19:00:00', '힙합/R&B', '올림픽홀', 99000, 'g11', '🎤', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
+    ('에픽하이 2025 이벤트', TIMESTAMP '2027-03-15 19:00:00', '힙합/R&B', '올림픽홀', 99000, 'g11', '🎤', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
 
-    ('Day6 3rd World Tour', TIMESTAMP '2025-04-12 19:00:00', 'K-POP', 'YES24 라이브홀', 88000, 'g12', '🎸', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE');
+    ('Day6 3rd World Tour', TIMESTAMP '2027-04-12 19:00:00', 'K-POP', 'YES24 라이브홀', 88000, 'g12', '🎸', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
+
+    -- J-POP
+    ('ZUTOMAYO Live Tour 2027', TIMESTAMP '2027-08-14 19:00:00', 'J-POP', '올림픽공원 SK핸드볼경기장', 143000, 'g1', '🌙', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
+
+    ('Vaundy Asia Tour 2027', TIMESTAMP '2027-09-05 19:00:00', 'J-POP', 'YES24 라이브홀', 132000, 'g5', '🎧', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
+
+    ('Ado Special Live in Seoul', TIMESTAMP '2027-10-02 19:00:00', 'J-POP', 'KSPO DOME', 165000, 'g11', '🎭', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
+
+    ('Tuki. Asia Tour 2027', TIMESTAMP '2027-11-08 19:00:00', 'J-POP', '블루스퀘어 마스터카드홀', 110000, 'g6', '✨', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
+
+    ('Aimyon Live in Seoul', TIMESTAMP '2027-07-18 18:00:00', 'J-POP', '올림픽공원 88잔디마당', 121000, 'g4', '🎸', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
+
+    -- 내한 (US POP)
+    ('Ariana Grande Eternal Sunshine Tour', TIMESTAMP '2027-06-20 19:30:00', 'POP', '고척 스카이돔', 187000, 'g7', '🎀', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
+
+    ('Charlie Puth Asia Tour 2027', TIMESTAMP '2027-08-29 19:00:00', 'POP', 'KSPO DOME', 143000, 'g3', '🎹', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
+
+    ('Post Malone Live in Seoul', TIMESTAMP '2027-09-19 19:00:00', 'POP', '잠실 올림픽 주경기장', 165000, 'g12', '🔥', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE'),
+
+    ('Justin Bieber World Tour 2027', TIMESTAMP '2027-10-24 19:00:00', 'POP', '인천 아시아드 주경기장', 176000, 'g2', '🎤', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVE');
 
 INSERT INTO seats (event_id, seat_no, status)
 SELECT e.event_id,
@@ -118,7 +138,8 @@ SELECT e.event_id,
 FROM (
          VALUES
              (1),(2),(3),(4),(5),(6),
-             (7),(8),(9),(10),(11),(12)
+             (7),(8),(9),(10),(11),(12),
+             (13),(14),(15),(16),(17),(18),(19),(20),(21)
      ) AS e(event_id)
          CROSS JOIN (
     VALUES ('A'),('B'),('C'),('D'),('E'),('F'),('G'),('H')
