@@ -27,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.springframework.data.redis.core.ValueOperations;
@@ -47,6 +46,9 @@ class ReservationServiceTest {
     @Mock
     private ReservationRepository reservationRepository;
 
+    @Mock
+    private ValueOperations<String, String> valueOperations;
+
     @InjectMocks
     private ReservationService reservationService;
 
@@ -57,8 +59,6 @@ class ReservationServiceTest {
         Long eventId = 1L;
         List<String> seatNumbers = List.of("A1");
         UUID memberId = UUID.randomUUID();
-
-        ValueOperations<String, String> valueOperations = mock(ValueOperations.class);
 
         Seat seat = new Seat(new Event(), "A1", SeatStatus.AVAILABLE);
 
@@ -100,7 +100,6 @@ class ReservationServiceTest {
         Long eventId = 1L;
         List<String> seatNumbers = List.of("A1");
         UUID memberId = UUID.randomUUID();
-        ValueOperations<String, String> valueOperations = mock(ValueOperations.class);
 
         when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.get(anyString())).thenReturn(null);
