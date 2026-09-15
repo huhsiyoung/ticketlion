@@ -13,7 +13,8 @@ public record EventResponse(
     Integer price,
     EventStatus status,
     String themeColor,
-    String thumbnailEmoji
+    String thumbnailEmoji,
+    String description
 ) {
     public static EventResponse from(Event e) {
         return new EventResponse(
@@ -25,7 +26,8 @@ public record EventResponse(
             e.getPrice(),
             e.getStatus(),
             e.getThemeColor(),
-            e.getThumbnailEmoji()
+            e.getThumbnailEmoji(),
+            e.getDescription()
         );
     }
 }

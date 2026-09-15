@@ -12,6 +12,10 @@
       box-sizing: border-box;
     }
 
+    html {
+      scrollbar-gutter: stable;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -38,7 +42,7 @@
     }
 
     .logo {
-      font-size: 24px;
+      font-size: 18px;
       font-weight: bold;
       color: white;
       text-decoration: none;
@@ -63,7 +67,7 @@
     .nav-menu button {
       color: white;
       text-decoration: none;
-      font-size: 14px;
+      font-size: 18px;
       font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
       font-weight: 600;
       transition: opacity 0.3s;
@@ -485,6 +489,16 @@
       color: white;
       border-color: #667eea;
     }
+
+    .page-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .page-btn:disabled:hover {
+      border-color: #e0e0e0;
+      color: #666;
+    }
   </style>
 </head>
 <body>
@@ -497,6 +511,7 @@
     </a>
 
     <ul class="nav-menu">
+      <li><a href="/events">공연 예매</a></li>
       <li><a href="/reservation-details">예매 내역</a></li>
       <li>
         <form th:action="@{/logout}" method="post">
@@ -529,7 +544,8 @@
 
   <!-- 이벤트 그리드 -->
   <div class="event-grid" id="event-grid">
-    <div class="event-card" th:each="event : ${events}">
+    <div class="event-card" th:each="event : ${events}"
+         th:attr="data-search=${#strings.toLowerCase(event.title + ' ' + event.category + ' ' + event.venue)}">
       <div class="event-poster">
         <div class="poster-image"
              th:attr="data-theme=${event.themeColor}"
@@ -569,123 +585,120 @@
 
       <div class="event-actions">
         <button class="btn btn-secondary" type="button">❤️</button>
-        <a class="btn btn-primary" th:href="@{/events/{id}/seats(id=${event.id})}">예매하기</a>
+        <a class="btn btn-primary" th:href="@{/events/{id}(id=${event.id})}">자세히 보기</a>
       </div>
+    </div>
+
+    <!-- 검색 결과 없음 -->
+    <div class="empty-state" id="empty-state" style="display: none; grid-column: 1 / -1;">
+      <div class="empty-icon">🎵</div>
+      <div class="empty-text">검색 결과가 없습니다</div>
+      <div class="empty-subtext">다른 검색어로 다시 시도해보세요</div>
     </div>
   </div>
 
   <!-- 페이지네이션 -->
-  <div class="pagination" id="pagination">
-    <button class="page-btn active">1</button>
-    <button class="page-btn">2</button>
-    <button class="page-btn">3</button>
-    <button class="page-btn">4</button>
-    <button class="page-btn">→</button>
-  </div>
+  <div class="pagination" id="pagination"></div>
 </div>
 
 <script>
-  let currentGenre = 'all';
-  let searchQuery = '';
+  // 검색 (서버에서 렌더링된 카드를 제목/카테고리/장소 기준으로 실시간 필터링)
+  const searchInput = document.getElementById('search-input');
+  const eventCards = Array.from(document.querySelectorAll('#event-grid .event-card'));
+  const emptyState = document.getElementById('empty-state');
 
-  // 이벤트 카드 렌더링
-  function renderEvents() {
-    const grid = document.getElementById('event-grid');
+  // 한글 초성 검색 지원
+  const CHOSUNG_LIST = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+  const CHOSUNG_ONLY_PATTERN = /^[ㄱ-ㅎ\s]+$/;
 
-    // 필터링
-    let filteredEvents = events;
-
-    if (currentGenre !== 'all') {
-      filteredEvents = filteredEvents.filter(e => e.genre === currentGenre);
-    }
-
-    if (searchQuery) {
-      filteredEvents = filteredEvents.filter(e =>
-          e.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          e.artist.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    // 빈 상태
-    if (filteredEvents.length === 0) {
-      grid.innerHTML = `
-                    <div class="empty-state" style="grid-column: 1 / -1;">
-                        <div class="empty-icon">🎵</div>
-                        <div class="empty-text">검색 결과가 없습니다</div>
-                        <div class="empty-subtext">다른 검색어로 다시 시도해보세요</div>
-                    </div>
-                `;
-      return;
-    }
-
-    // 이벤트 카드 생성
-    grid.innerHTML = filteredEvents.map(eventItem => `
-                <div class="event-card" onclick="viewEventDetail(${eventItem.id})">
-                    <div class="event-poster">
-                        <div class="poster-image" style="background: ${eventItem.gradient}">
-                            ${eventItem.emoji}
-                        </div>
-                        <div class="d-day">${eventItem.dday}</div>
-                    </div>
-                    <div class="event-info">
-                        <div class="event-category">${eventItem.category}</div>
-                        <h3 class="event-title">${eventItem.title}</h3>
-                        <div class="event-detail">
-                            <span class="detail-icon">📍</span>
-                            <span>${eventItem.venue}</span>
-                        </div>
-                        <div class="event-detail">
-                            <span class="detail-icon">🗓️</span>
-                            <span>${eventItem.date}</span>
-                        </div>
-                        <div class="event-detail">
-                            <span class="detail-icon">🕐</span>
-                            <span>${eventItem.time} 시작</span>
-                        </div>
-                        <div class="event-price">
-                            <span class="price-label">가격</span>
-                            <span class="price-value">${eventItem.price}</span>
-                        </div>
-                    </div>
-                    <div class="event-actions">
-                        <button class="btn btn-secondary" onclick="event.stopPropagation(); addToWishlist(${eventItem.id})">
-                            ❤️
-                        </button>
-                        <button class="btn btn-primary" onclick="event.stopPropagation(); bookEvent(${eventItem.id})">
-                            예매하기
-                        </button>
-                    </div>
-                </div>
-            `).join('');
+  // 완성형 한글 음절 1개를 초성으로 변환 (한글이 아니면 그대로 반환)
+  function toChosungChar(ch) {
+    const code = ch.charCodeAt(0) - 0xAC00;
+    if (code < 0 || code > 11171) return ch;
+    return CHOSUNG_LIST[Math.floor(code / 588)];
   }
 
-  // 검색
-  document.getElementById('search-input').addEventListener('input', function(e) {
-    searchQuery = e.target.value;
-    renderEvents();
+  function toChosungString(str) {
+    let result = '';
+    for (const ch of str) result += toChosungChar(ch);
+    return result;
+  }
+
+  // 카드별 초성 문자열은 한 번만 계산해서 캐싱
+  const chosungCache = new Map();
+  function getCardChosung(card) {
+    if (!chosungCache.has(card)) {
+      chosungCache.set(card, toChosungString(card.dataset.search || ''));
+    }
+    return chosungCache.get(card);
+  }
+
+  function getMatchingCards(query) {
+    const normalized = query.trim().toLowerCase();
+    const isChosungQuery = normalized !== '' && CHOSUNG_ONLY_PATTERN.test(normalized);
+
+    return eventCards.filter(card => {
+      if (normalized === '') return true;
+      if (isChosungQuery) return getCardChosung(card).includes(normalized);
+      const haystack = card.dataset.search || '';
+      return haystack.includes(normalized);
+    });
+  }
+
+  // 페이지네이션 (실제 표시 중인 카드 수에 맞춰 페이지 버튼을 동적으로 생성)
+  const PAGE_SIZE = 6;
+  const paginationEl = document.getElementById('pagination');
+  let matchingCards = eventCards;
+  let currentPage = 1;
+
+  function showPage(page) {
+    const totalPages = Math.max(1, Math.ceil(matchingCards.length / PAGE_SIZE));
+    currentPage = Math.min(Math.max(1, page), totalPages);
+
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const end = start + PAGE_SIZE;
+
+    eventCards.forEach(card => (card.style.display = 'none'));
+    matchingCards.slice(start, end).forEach(card => (card.style.display = ''));
+
+    renderPagination(totalPages);
+  }
+
+  function renderPagination(totalPages) {
+    paginationEl.innerHTML = '';
+    if (totalPages <= 1) return;
+
+    const makeBtn = (label, page, opts = {}) => {
+      const btn = document.createElement('button');
+      btn.className = 'page-btn' + (opts.active ? ' active' : '');
+      btn.type = 'button';
+      btn.textContent = label;
+      btn.disabled = !!opts.disabled;
+      btn.addEventListener('click', () => showPage(page));
+      return btn;
+    };
+
+    paginationEl.appendChild(makeBtn('←', currentPage - 1, { disabled: currentPage === 1 }));
+    for (let p = 1; p <= totalPages; p++) {
+      paginationEl.appendChild(makeBtn(String(p), p, { active: p === currentPage }));
+    }
+    paginationEl.appendChild(makeBtn('→', currentPage + 1, { disabled: currentPage === totalPages }));
+  }
+
+  function filterEvents(query) {
+    matchingCards = getMatchingCards(query);
+    emptyState.style.display = matchingCards.length === 0 ? '' : 'none';
+    showPage(1);
+  }
+
+  let searchDebounce;
+  searchInput.addEventListener('input', function(e) {
+    clearTimeout(searchDebounce);
+    const query = e.target.value;
+    searchDebounce = setTimeout(() => filterEvents(query), 150);
   });
 
-  // 이벤트 상세 보기
-  function viewEventDetail(id) {
-    const eventItem = events.find(e => e.id === id);
-    alert(`"${eventItem.title}" 상세 페이지로 이동합니다.`);
-    // window.location.href = `event-detail.html?id=${id}`;
-  }
-
-  // 예매하기
-  function bookEvent(id) {
-    const eventItem = events.find(e => e.id === id);
-
-    if (confirm(`"${eventItem.title}" 이벤트를 예매하시겠습니까?`)) {
-      window.location.href = `/events/${id}/seats`;
-    }
-  }
-
-  // 위시리스트 추가
-  function addToWishlist(id) {
-    const eventItem = events.find(e => e.id === id);
-    alert(`"${eventItem.title}"이(가) 위시리스트에 추가되었습니다.`);
-  }
+  filterEvents('');
 
   // 디데이 카운터
   document.addEventListener("DOMContentLoaded", () => {
@@ -727,9 +740,6 @@
       el.style.background = gradientMap[key] ?? gradientMap.g10;
     });
   });
-
-  // 초기 렌더링
-  renderEvents();
 </script>
 </body>
 </html>

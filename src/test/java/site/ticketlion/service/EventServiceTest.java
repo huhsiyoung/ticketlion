@@ -38,8 +38,8 @@ class EventServiceTest {
     @DisplayName("이벤트 생성 성공")
     void createEvent_success() {
         // given
-        EventCreateRequest request = new EventCreateRequest("Test Event", LocalDateTime.now(), "CONCERT", "Test Venue", 10000, "#FFFFFF", "😀");
-        Event event = new Event(1L, request.title(), request.startAt(), request.category(), request.venue(), request.price(), null, null, EventStatus.ACTIVE, request.themeColor(), request.thumbnailEmoji());
+        EventCreateRequest request = new EventCreateRequest("Test Event", LocalDateTime.now(), "CONCERT", "Test Venue", 10000, "#FFFFFF", "😀", null);
+        Event event = new Event(1L, request.title(), request.startAt(), request.category(), request.venue(), request.price(), null, null, EventStatus.ACTIVE, request.themeColor(), request.thumbnailEmoji(), request.description());
         when(eventRepository.save(any(Event.class))).thenReturn(event);
 
         // when
@@ -56,7 +56,7 @@ class EventServiceTest {
     void getEvent_success() {
         // given
         Long eventId = 1L;
-        Event event = new Event(eventId, "Test Event", LocalDateTime.now(), "CONCERT", "Test Venue", 10000, null, null, EventStatus.ACTIVE, "#FFFFFF", "😀");
+        Event event = new Event(eventId, "Test Event", LocalDateTime.now(), "CONCERT", "Test Venue", 10000, null, null, EventStatus.ACTIVE, "#FFFFFF", "😀", null);
         when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
 
         // when
@@ -72,8 +72,8 @@ class EventServiceTest {
     void updateEvent_success() {
         // given
         Long eventId = 1L;
-        EventUpdateRequest request = new EventUpdateRequest("Updated Event", LocalDateTime.now().plusDays(1), "MUSICAL", "Updated Venue", 12000, "#000000", "😂");
-        Event event = new Event(eventId, "Test Event", LocalDateTime.now(), "CONCERT", "Test Venue", 10000, null, null, EventStatus.ACTIVE, "#FFFFFF", "😀");
+        EventUpdateRequest request = new EventUpdateRequest("Updated Event", LocalDateTime.now().plusDays(1), "MUSICAL", "Updated Venue", 12000, "#000000", "😂", null);
+        Event event = new Event(eventId, "Test Event", LocalDateTime.now(), "CONCERT", "Test Venue", 10000, null, null, EventStatus.ACTIVE, "#FFFFFF", "😀", null);
         when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
 
         // when

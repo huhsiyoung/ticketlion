@@ -11,6 +11,7 @@ import site.ticketlion.domain.Seat;
 import site.ticketlion.domain.SeatStatus;
 import site.ticketlion.web.dto.request.EventCreateRequest;
 import site.ticketlion.web.dto.request.EventUpdateRequest;
+import site.ticketlion.web.dto.response.EventDetailResponse;
 import site.ticketlion.web.dto.response.EventTicketingPageResponse;
 import site.ticketlion.repository.EventRepository;
 import site.ticketlion.repository.SeatRepository;
@@ -43,7 +44,8 @@ public class EventService {
             null,
             EventStatus.ACTIVE,
             req.themeColor(),
-            req.thumbnailEmoji()
+            req.thumbnailEmoji(),
+            req.description()
         );
 
         Event saved = eventRepository.save(event);
@@ -72,7 +74,8 @@ public class EventService {
             req.venue(),
             req.price(),
             req.themeColor(),
-            req.thumbnailEmoji()
+            req.thumbnailEmoji(),
+            req.description()
         );
 
         return event;
@@ -104,6 +107,18 @@ public class EventService {
             event.getPrice(),
             seatDtos
         );
+    }
+
+    @Transactional(readOnly = true)
+    public EventDetailResponse getEventDetail(Long eventId) {
+        Event event = getEvent(eventId);
+
+        List<Seat> seats = seatRepository.findAllByEventId(eventId);
+        long available = seats.stream()
+            .filter(s -> s.getStatus() == SeatStatus.AVAILABLE)
+            .count();
+
+        return new EventDetailResponse(event, seats.size(), (int) available);
     }
 
     private List<Seat> generateSeats(Event event) {

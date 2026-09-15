@@ -44,6 +44,17 @@ public class PageController {
         return "event";
     }
 
+    @GetMapping("/events/{eventId}")
+    public String eventDetail(@PathVariable Long eventId, Model model) {
+        var detail = eventService.getEventDetail(eventId);
+
+        model.addAttribute("event", detail.event());
+        model.addAttribute("totalSeats", detail.totalSeats());
+        model.addAttribute("availableSeats", detail.availableSeats());
+
+        return "event-detail";
+    }
+
     @GetMapping("/events/{eventId}/seats")
     public String selectSeat(@PathVariable Long eventId, Model model, Authentication authentication) {
         int pendingCount = 0;
