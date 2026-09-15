@@ -31,7 +31,7 @@ class ReservationRepositoryTest {
     @DisplayName("ID로 예매 정보와 좌석, 이벤트 정보 함께 조회")
     void findByIdWithSeatAndEvent() {
         // given
-        Event event = new Event(null, "Test Event", LocalDateTime.now(), "CONCERT", "Venue", 10000, null, null, EventStatus.ACTIVE, "#FFFFFF", "😀");
+        Event event = new Event(null, "Test Event", LocalDateTime.now(), "CONCERT", "Venue", 10000, null, null, EventStatus.ACTIVE, "#FFFFFF", "😀", null);
         eventRepository.save(event);
         Seat seat = new Seat(event, "A1", SeatStatus.RESERVED);
         seatRepository.save(seat);
@@ -51,7 +51,7 @@ class ReservationRepositoryTest {
     @DisplayName("특정 시간 이전의 PENDING 상태 예매 조회")
     void findByStatusAndReservedAtBefore() {
         // given
-        Event event = new Event(null, "Test Event", LocalDateTime.now(), "CONCERT", "Venue", 10000, null, null, EventStatus.ACTIVE, "#FFFFFF", "😀");
+        Event event = new Event(null, "Test Event", LocalDateTime.now(), "CONCERT", "Venue", 10000, null, null, EventStatus.ACTIVE, "#FFFFFF", "😀", null);
         eventRepository.save(event);
         Seat seat1 = new Seat(event, "A1", SeatStatus.RESERVED);
         seatRepository.save(seat1);
@@ -77,7 +77,7 @@ class ReservationRepositoryTest {
         // given
         UUID userId = UUID.randomUUID();
         Instant reservedAt = Instant.now().truncatedTo(ChronoUnit.MILLIS);
-        Event event = new Event(null, "Test Event", LocalDateTime.now(), "CONCERT", "Venue", 10000, null, null, EventStatus.ACTIVE, "#FFFFFF", "😀");
+        Event event = new Event(null, "Test Event", LocalDateTime.now(), "CONCERT", "Venue", 10000, null, null, EventStatus.ACTIVE, "#FFFFFF", "😀", null);
         eventRepository.save(event);
         Seat seat1 = new Seat(event, "A1", SeatStatus.RESERVED);
         seatRepository.save(seat1);
@@ -101,7 +101,7 @@ class ReservationRepositoryTest {
     void findAllByUserIdWithSeatAndEvent() {
         // given
         UUID userId = UUID.randomUUID();
-        Event event = new Event(null, "Test Event", LocalDateTime.now(), "CONCERT", "Venue", 10000, null, null, EventStatus.ACTIVE, "#FFFFFF", "😀");
+        Event event = new Event(null, "Test Event", LocalDateTime.now(), "CONCERT", "Venue", 10000, null, null, EventStatus.ACTIVE, "#FFFFFF", "😀", null);
         eventRepository.save(event);
         Seat seat1 = new Seat(event, "A1", SeatStatus.RESERVED);
         seatRepository.save(seat1);

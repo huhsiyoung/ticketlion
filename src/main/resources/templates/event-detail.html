@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>티켓사자 - 공연 상세</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scrollbar-gutter: stable;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* 헤더 */
+    header {
+      position: relative;
+      z-index: 10;
+      padding: 20px 0;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+    }
+
+    nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: bold;
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+    }
+
+    .nav-menu {
+      display: flex;
+      gap: 30px;
+      list-style: none;
+    }
+
+    .nav-menu a,
+    .nav-menu button {
+      color: white;
+      text-decoration: none;
+      font-size: 18px;
+      font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 600;
+      transition: opacity 0.3s;
+      background: transparent;
+      border: none;
+      padding: 0;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .nav-menu a:hover,
+    .nav-menu button:hover {
+      opacity: 0.8;
+    }
+
+    /* 메인 컨테이너 */
+    .detail-container {
+      position: relative;
+      z-index: 1;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .back-link {
+      display: inline-block;
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      opacity: 0.85;
+      margin-bottom: 16px;
+    }
+
+    .back-link:hover {
+      opacity: 1;
+    }
+
+    /* 히어로 카드 */
+    .hero-card {
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      margin-bottom: 24px;
+    }
+
+    .hero-poster {
+      width: 100%;
+      height: 260px;
+      position: relative;
+    }
+
+    .hero-emoji {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 100px;
+    }
+
+    .hero-badge {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: rgba(255, 255, 255, 0.95);
+      color: #667eea;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: bold;
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-dday {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: bold;
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-title {
+      padding: 24px 25px 25px;
+      font-size: 26px;
+      font-weight: bold;
+      color: #333;
+      line-height: 1.3;
+    }
+
+    /* 콘텐츠 카드 */
+    .content-card {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 14px;
+    }
+
+    .description-text {
+      font-size: 15px;
+      color: #555;
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+
+    .detail-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 12px 0;
+      font-size: 15px;
+      color: #444;
+    }
+
+    .detail-icon {
+      font-size: 17px;
+      width: 22px;
+      text-align: center;
+    }
+
+    .detail-row.price {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #e0e0e0;
+      font-size: 22px;
+      font-weight: bold;
+      color: #667eea;
+    }
+
+    .booking-status {
+      margin-top: 28px;
+      padding-top: 24px;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .booking-status-text {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .booking-status-text strong {
+      color: #667eea;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      background: #f0f0f5;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      border-radius: 10px;
+    }
+
+    .cta-btn {
+      display: block;
+      width: 100%;
+      margin-top: 28px;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 17px;
+      font-weight: bold;
+      text-align: center;
+      text-decoration: none;
+      color: white;
+      background: #667eea;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .cta-btn:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 600px) {
+      .hero-poster { height: 200px; }
+      .hero-emoji { font-size: 70px; }
+      .hero-title { font-size: 20px; }
+      .content-card { padding: 22px; }
+    }
+  </style>
+</head>
+<body>
+<!-- 헤더 -->
+<header>
+  <nav>
+    <a href="/events" class="logo">
+      <img src="/images/logo.webp" alt="티켓사자 로고" class="logo-img">
+      티켓사자
+    </a>
+
+    <ul class="nav-menu">
+      <li><a href="/events">공연 예매</a></li>
+      <li><a href="/reservation-details">예매 내역</a></li>
+      <li>
+        <form th:action="@{/logout}" method="post">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+          <button type="submit">로그아웃</button>
+        </form>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+<!-- 메인 컨테이너 -->
+<div class="detail-container">
+  <a href="/events" class="back-link">← 목록으로</a>
+
+  <!-- 히어로 -->
+  <div class="hero-card">
+    <div class="hero-poster">
+      <div class="hero-emoji" th:attr="data-theme=${event.themeColor}" th:text="${event.thumbnailEmoji}">🎤</div>
+      <div class="hero-badge" th:text="${event.category}">CATEGORY</div>
+      <div class="hero-dday"
+           th:attr="data-startat=${#temporals.format(event.startAt, 'yyyy-MM-dd''T''HH:mm:ss')}">
+        D-DAY
+      </div>
+    </div>
+    <h1 class="hero-title" th:text="${event.title}">공연 제목</h1>
+  </div>
+
+  <!-- 소개 + 상세정보 + 예매현황 -->
+  <div class="content-card">
+    <div class="section-title">공연 소개</div>
+    <p class="description-text"
+       th:text="${event.description != null and !#strings.isEmpty(event.description)} ? ${event.description} : '공연 소개가 준비 중입니다.'">
+      공연 소개 텍스트가 여기 표시됩니다.
+    </p>
+
+    <div class="section-title">상세 정보</div>
+    <div class="detail-row">
+      <span class="detail-icon">📍</span>
+      <span th:text="${event.venue}">장소</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-icon">🗓️</span>
+      <span th:text="${#temporals.format(event.startAt, 'yyyy.MM.dd')}">날짜</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-icon">🕐</span>
+      <span th:text="${#temporals.format(event.startAt, 'HH:mm') + ' 시작'}">시간</span>
+    </div>
+    <div class="detail-row price">
+      <span class="detail-icon">💰</span>
+      <span th:text="${#numbers.formatInteger(event.price, 0, 'COMMA')} + '원'">가격</span>
+    </div>
+
+    <div class="booking-status" th:if="${totalSeats > 0}">
+      <div class="section-title">예매 현황</div>
+      <div class="booking-status-text">
+        총 <span th:text="${totalSeats}">80</span>석 중
+        <strong th:text="${availableSeats}">0</strong>석 남음
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill"
+             th:style="'width:' + ${(totalSeats - availableSeats) * 100 / totalSeats} + '%'"></div>
+      </div>
+    </div>
+
+    <a class="cta-btn" th:href="@{/events/{id}/seats(id=${event.id})}">예매하기</a>
+  </div>
+</div>
+
+<script>
+  // 디데이 카운터
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".hero-dday[data-startat]").forEach(el => {
+      const start = new Date(el.dataset.startat);
+      const today = new Date();
+
+      start.setHours(0,0,0,0);
+      today.setHours(0,0,0,0);
+
+      const diffDays = Math.ceil((start - today) / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 0) el.textContent = "D-DAY";
+      else if (diffDays > 0) el.textContent = `D-${diffDays}`;
+      else el.textContent = `D+${Math.abs(diffDays)}`;
+    });
+  });
+
+  // 히어로 배경 지정
+  const gradientMap = {
+    g1:  'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+    g2:  'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+    g3:  'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+    g4:  'linear-gradient(135deg, #ff6e7f 0%, #bfe9ff 100%)',
+    g5:  'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+    g6:  'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+    g7:  'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+    g8:  'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
+    g9:  'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+    g10: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    g11: 'linear-gradient(135deg, #434343 0%, #000000 100%)',
+    g12: 'linear-gradient(135deg, #f2994a 0%, #f2c94c 100%)'
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.hero-emoji').forEach(el => {
+      const key = el.dataset.theme;
+      el.style.background = gradientMap[key] ?? gradientMap.g10;
+    });
+  });
+</script>
+</body>
+</html>

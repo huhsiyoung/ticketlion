@@ -9,5 +9,6 @@ public record EventCreateRequest(
     String venue,
     Integer price,
     String themeColor,
-    String thumbnailEmoji
+    String thumbnailEmoji,
+    String description
 ) {}
