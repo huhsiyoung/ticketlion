@@ -1,9 +1,9 @@
 package site.ticketlion.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.annotation.Profile;
@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -42,8 +41,18 @@ class SeatHoldServiceTest {
     @Mock
     private SeatRepository seatRepository;
 
-    @InjectMocks
+    @Mock
+    private ValueOperations<String, String> valueOperations;
+
     private SeatHoldService seatHoldService;
+
+    @BeforeEach
+    void setUp() {
+        // @InjectMocks의 생성자 자동 매칭은 RedisTemplate와 그 하위 타입인
+        // StringRedisTemplate이 함께 목킹될 때 어떤 mock을 주입할지 모호해져
+        // 간헐적으로 잘못된 mock이 주입되는 문제가 있어 명시적으로 생성한다.
+        seatHoldService = new SeatHoldService(redisTemplate, stringRedisTemplate, holdSeatsScript);
+    }
 
     @Test
     @DisplayName("좌석 점유 성공 - 단일 좌석")
@@ -52,7 +61,6 @@ class SeatHoldServiceTest {
         Long eventId = 1L;
         String seatId = "A1";
         UUID userId = UUID.randomUUID();
-        ValueOperations<String, String> valueOperations = mock(ValueOperations.class);
 
         when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.setIfAbsent(anyString(), anyString(), any(Duration.class))).thenReturn(true);
@@ -71,7 +79,6 @@ class SeatHoldServiceTest {
         Long eventId = 1L;
         String seatId = "A1";
         UUID userId = UUID.randomUUID();
-        ValueOperations<String, String> valueOperations = mock(ValueOperations.class);
 
         when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.setIfAbsent(anyString(), anyString(), any(Duration.class))).thenReturn(false);
@@ -129,7 +136,6 @@ class SeatHoldServiceTest {
         Long eventId = 1L;
         String seatId = "A1";
         UUID userId = UUID.randomUUID();
-        ValueOperations<String, String> valueOperations = mock(ValueOperations.class);
 
         when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.get(anyString())).thenReturn(userId.toString());
@@ -149,7 +155,6 @@ class SeatHoldServiceTest {
         String seatId = "A1";
         UUID userId = UUID.randomUUID();
         UUID otherUserId = UUID.randomUUID();
-        ValueOperations<String, String> valueOperations = mock(ValueOperations.class);
 
         when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.get(anyString())).thenReturn(otherUserId.toString());
@@ -168,7 +173,6 @@ class SeatHoldServiceTest {
         Long eventId = 1L;
         String seatId = "A1";
         UUID userId = UUID.randomUUID();
-        ValueOperations<String, String> valueOperations = mock(ValueOperations.class);
 
         when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.get(anyString())).thenReturn(null);
