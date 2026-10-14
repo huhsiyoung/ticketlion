@@ -32,6 +32,8 @@ jobs:
       # 5️⃣ 테스트 실행
       - name: Run tests
         run: ./gradlew test
+        env:
+          SECURITY_REMEMBER_ME_KEY: ${{ secrets.REMEMBER_ME_KEY }}
 
       # 6️⃣ JAR 빌드
       - name: Build JAR
