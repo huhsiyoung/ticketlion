@@ -18,13 +18,11 @@ https://ticketlion.site
 
 ## 주요 기능
 
-- 회원가입 / 로그인
 - 이벤트 목록 조회 및 좌석 선택
 - Redis Lua 스크립트를 통한 원자적 좌석 선점 (TTL 10분)
 - 비관적 락(Pessimistic Lock) 기반 결제 처리
 - 좌석 최종 배정 및 예매 확정
 - 만료된 선점 자동 정리 (스케줄러, 1분 주기)
-- 예매 취소
 
 ## 예약 흐름
 
@@ -84,15 +82,7 @@ brew services start redis
 
 ## 아키텍처
 
-레이어드 MVC: `Controller → Service → Repository → Domain`
-
-### 엔티티 관계
-
-```
-Event (1) ─→ (N) Seat
-Member (1) ─→ (N) Reservation ─→ (1) Payment
-Reservation ─→ (1) Seat
-```
+<img width="1300" height="900" alt="image" src="https://github.com/user-attachments/assets/dade6916-d790-410c-b4e3-e07679a3d045" />
 
 ### 동시성 제어
 
@@ -104,22 +94,6 @@ Reservation ─→ (1) Seat
 ### 정리 스케줄러
 
 매 분마다 실행되어 10분 이상 경과한 `PENDING` 예약을 자동 취소하고 좌석을 `AVAILABLE`로 복구합니다.
-
-## 프로파일
-
-| 프로파일 | DB | 비고 |
-|----------|----|------|
-| `dev` (기본) | H2 파일 (`./h2db/testdb`) | SQL 로깅 활성화, H2 콘솔 사용 가능 |
-| `prod` | PostgreSQL (Supabase) | SQL 로깅 비활성화, `ddl-auto: validate` |
-
-## 테스트
-
-```bash
-./gradlew test
-
-# 단일 클래스
-./gradlew test --tests ClassName
-```
 
 ## CI/CD
 
